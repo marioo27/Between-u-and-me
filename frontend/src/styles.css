@@ -1,0 +1,77 @@
+:root {
+  --ink: #1c2422;
+  --ink-soft: #3d4a46;
+  --mist: #e8f0ec;
+  --foam: #f4faf7;
+  --dusk-top: #f7ebe0;
+  --dusk-mid: #d6e4df;
+  --dusk-deep: #7fa39a;
+  --accent: #e06b4a;
+  --accent-deep: #c45335;
+  --glow-warm: rgba(240, 170, 120, 0.45);
+  --glow-cool: rgba(120, 170, 160, 0.35);
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Figtree', sans-serif;
+  --radius-btn: 14px;
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+}
+
+body {
+  color: var(--ink);
+  font-family: var(--font-body);
+  background: var(--foam);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font: inherit;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes drift {
+  0%,
+  100% {
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    transform: translate3d(2%, -3%, 0) scale(1.05);
+  }
+}
+
+@keyframes shimmer {
+  0%,
+  100% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.9;
+  }
+}
