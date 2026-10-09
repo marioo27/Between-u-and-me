@@ -8,7 +8,7 @@
 [![Netlify](https://img.shields.io/badge/Deploy-Netlify-00C7B7?logo=netlify&logoColor=white)](https://www.netlify.com/)
 
 Friends’ game vault — play party games together. First game: **Never Have I Ever** / **Yo Nunca**.
-
+Live app: https://between-u-and-me.netlify.app/
 ---
 
 ## English
