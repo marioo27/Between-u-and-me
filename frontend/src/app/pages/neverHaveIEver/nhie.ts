@@ -1,13 +1,15 @@
 import { HttpClient } from '@angular/common/http';
 import {
   Component,
+  DestroyRef,
   computed,
+  effect,
   inject,
-  OnInit,
   signal,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
-import { I18nService } from '../../core/i18n/i18n';
+import { I18nService, Locale } from '../../core/i18n/i18n';
 import {
   collectPhrases,
   createDeck,
@@ -19,15 +21,21 @@ import {
 
 type LoadState = 'loading' | 'ready' | 'error';
 
+const PROMPT_FILES: Record<Locale, string> = {
+  es: '/data/yo-nunca.json',
+  en: '/data/nhie.json',
+};
+
 @Component({
   imports: [RouterLink],
   selector: 'app-nhie',
   styleUrl: './nhie.css',
   templateUrl: './nhie.html',
 })
-export class Nhie implements OnInit {
+export class Nhie {
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
 
@@ -73,17 +81,20 @@ export class Nhie implements OnInit {
     () => this.loadState() === 'ready' && this.poolSize() === 0,
   );
 
-  ngOnInit(): void {
-    this.http.get<NhiePromptBank>('/data/yo-nunca.json').subscribe({
-      next: (data) => {
-        const cats = listCategories(data);
-        this.bank.set(data);
-        this.categories.set(cats);
-        this.selected.set([...cats]);
-        this.rebuildDeck(cats);
-        this.loadState.set('ready');
-      },
-      error: () => this.loadState.set('error'),
+  constructor() {
+    effect((onCleanup) => {
+      const locale = this.i18n.locale();
+      this.loadState.set('loading');
+
+      const sub = this.http
+        .get<NhiePromptBank>(PROMPT_FILES[locale])
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (data) => this.applyBank(data),
+          error: () => this.loadState.set('error'),
+        });
+
+      onCleanup(() => sub.unsubscribe());
     });
   }
 
@@ -118,6 +129,21 @@ export class Nhie implements OnInit {
     const next = drawNext(this.deck());
     this.deck.set(next);
     this.showReshuffleNote.set(next.reshuffled);
+  }
+
+  private applyBank(data: NhiePromptBank): void {
+    const cats = listCategories(data);
+    const previous = this.selected();
+    const nextSelected =
+      previous.length === 0
+        ? [...cats]
+        : previous.filter((id) => cats.includes(id));
+
+    this.bank.set(data);
+    this.categories.set(cats);
+    this.selected.set(nextSelected.length > 0 ? nextSelected : [...cats]);
+    this.rebuildDeck(this.selected());
+    this.loadState.set('ready');
   }
 
   private applySelection(next: string[]): void {
