@@ -1,9 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { Footer } from './shared/footer/footer';
 import { LanguageBubble } from './shared/language-bubble/language-bubble';
 
 @Component({
-  imports: [RouterOutlet, LanguageBubble],
+  imports: [RouterOutlet, Footer, LanguageBubble],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',
