@@ -1,8 +1,9 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { LanguageBubble } from './shared/language-bubble/language-bubble';
 
 @Component({
-  imports: [RouterOutlet],
+  imports: [RouterOutlet, LanguageBubble],
   selector: 'app-root',
   styleUrl: './app.css',
   templateUrl: './app.html',

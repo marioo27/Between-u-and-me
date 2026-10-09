@@ -1,0 +1,52 @@
+<div class="bubble" [class.bubble--open]="open()">
+  @if (open()) {
+    <div
+      class="bubble__menu"
+      role="menu"
+      [attr.aria-label]="t().langLabel"
+    >
+      <button
+        type="button"
+        class="bubble__option"
+        role="menuitemradio"
+        [attr.aria-checked]="locale() === 'es'"
+        [class.bubble__option--active]="locale() === 'es'"
+        (click)="choose('es')"
+      >
+        <span class="bubble__code">ES</span>
+        <span>{{ t().langEs }}</span>
+      </button>
+      <button
+        type="button"
+        class="bubble__option"
+        role="menuitemradio"
+        [attr.aria-checked]="locale() === 'en'"
+        [class.bubble__option--active]="locale() === 'en'"
+        (click)="choose('en')"
+      >
+        <span class="bubble__code">EN</span>
+        <span>{{ t().langEn }}</span>
+      </button>
+    </div>
+  }
+
+  <button
+    type="button"
+    class="bubble__trigger"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="menu"
+    [attr.aria-label]="t().langLabel"
+    (click)="toggleMenu()"
+  >
+    <span class="bubble__trigger-code">{{ locale().toUpperCase() }}</span>
+  </button>
+</div>
+
+@if (open()) {
+  <button
+    type="button"
+    class="bubble__backdrop"
+    aria-label="Close"
+    (click)="closeMenu()"
+  ></button>
+}

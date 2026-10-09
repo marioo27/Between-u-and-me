@@ -1,0 +1,121 @@
+:host {
+  position: fixed;
+  right: clamp(1rem, 3vw, 1.5rem);
+  bottom: clamp(1rem, 3vw, 1.5rem);
+  z-index: 40;
+}
+
+.bubble {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.65rem;
+}
+
+.bubble__trigger {
+  display: grid;
+  place-items: center;
+  width: 3.25rem;
+  height: 3.25rem;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 12%, transparent);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--foam) 88%, white);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(28, 36, 34, 0.12);
+  transition:
+    transform 0.25s var(--ease-out),
+    background-color 0.2s ease,
+    box-shadow 0.25s var(--ease-out);
+  animation: rise-in 0.7s var(--ease-out) 0.35s both;
+}
+
+.bubble__trigger:hover {
+  transform: translateY(-2px);
+  background: #fff;
+  box-shadow: 0 14px 28px rgba(28, 36, 34, 0.16);
+}
+
+.bubble__trigger:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 3px;
+}
+
+.bubble--open .bubble__trigger {
+  background: var(--ink);
+  color: var(--foam);
+  border-color: var(--ink);
+}
+
+.bubble__trigger-code {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.bubble__menu {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  min-width: 10.5rem;
+  padding: 0.45rem;
+  border: 1.5px solid color-mix(in srgb, var(--ink) 10%, transparent);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--foam) 94%, white);
+  box-shadow: 0 16px 36px rgba(28, 36, 34, 0.14);
+  animation: rise-in 0.28s var(--ease-out) both;
+}
+
+.bubble__option {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  width: 100%;
+  padding: 0.65rem 0.75rem;
+  border: 0;
+  border-radius: 11px;
+  background: transparent;
+  color: var(--ink);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.bubble__option:hover {
+  background: color-mix(in srgb, var(--dusk-mid) 70%, white);
+}
+
+.bubble__option--active {
+  background: color-mix(in srgb, var(--accent) 14%, white);
+  color: var(--accent-deep);
+  font-weight: 600;
+}
+
+.bubble__option:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.bubble__code {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.7rem;
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.bubble__backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  border: 0;
+  background: transparent;
+  cursor: default;
+}
