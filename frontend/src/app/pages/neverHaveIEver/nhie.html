@@ -16,33 +16,52 @@
     }
 
     @if (loadState() === 'ready') {
-      <fieldset class="game__filters">
-        <legend class="game__filters-legend">{{ t().nhieCategoriesLabel }}</legend>
+      <div class="game__filters">
+        <button
+          type="button"
+          class="game__filters-toggle"
+          [attr.aria-expanded]="filtersOpen()"
+          aria-controls="nhie-category-panel"
+          (click)="toggleFilters()"
+        >
+          <span class="game__filters-toggle-text">
+            <span class="game__filters-toggle-label">{{ t().nhieCategoriesLabel }}</span>
+            <span class="game__filters-toggle-summary">{{ categoriesSummary() }}</span>
+          </span>
+          <span class="game__filters-chevron" aria-hidden="true"></span>
+        </button>
 
-        <div class="game__chips" role="group" [attr.aria-label]="t().nhieCategoriesLabel">
-          <button
-            type="button"
-            class="game__chip"
-            [class.game__chip--active]="allSelected()"
-            [attr.aria-pressed]="allSelected()"
-            (click)="toggleAll()"
+        @if (filtersOpen()) {
+          <div
+            id="nhie-category-panel"
+            class="game__chips"
+            role="group"
+            [attr.aria-label]="t().nhieCategoriesLabel"
           >
-            {{ t().nhieAllCategories }}
-          </button>
-
-          @for (category of categories(); track category) {
             <button
               type="button"
               class="game__chip"
-              [class.game__chip--active]="isSelected(category)"
-              [attr.aria-pressed]="isSelected(category)"
-              (click)="toggleCategory(category)"
+              [class.game__chip--active]="allSelected()"
+              [attr.aria-pressed]="allSelected()"
+              (click)="toggleAll()"
             >
-              {{ categoryLabel(category) }}
+              {{ t().nhieAllCategories }}
             </button>
-          }
-        </div>
-      </fieldset>
+
+            @for (category of categories(); track category) {
+              <button
+                type="button"
+                class="game__chip"
+                [class.game__chip--active]="isSelected(category)"
+                [attr.aria-pressed]="isSelected(category)"
+                (click)="toggleCategory(category)"
+              >
+                {{ categoryLabel(category) }}
+              </button>
+            }
+          </div>
+        }
+      </div>
 
       @if (isEmpty()) {
         <p class="game__status game__status--empty" role="status">

@@ -50,11 +50,26 @@ export class Nhie {
     reshuffled: false,
   });
   protected readonly showReshuffleNote = signal(false);
+  protected readonly filtersOpen = signal(false);
 
   protected readonly allSelected = computed(() => {
     const all = this.categories();
     const selected = this.selected();
     return all.length > 0 && selected.length === all.length;
+  });
+
+  protected readonly categoriesSummary = computed(() => {
+    const selected = this.selected();
+    if (selected.length === 0) {
+      return this.t().nhieCategoriesSummaryNone;
+    }
+    if (this.allSelected()) {
+      return this.t().nhieCategoriesSummaryAll;
+    }
+    return this.t().nhieCategoriesSummaryCount.replace(
+      '{count}',
+      String(selected.length),
+    );
   });
 
   protected readonly poolSize = computed(() => this.deck().pool.length);
@@ -100,6 +115,10 @@ export class Nhie {
 
   protected categoryLabel(id: string): string {
     return this.i18n.categoryLabel(id);
+  }
+
+  protected toggleFilters(): void {
+    this.filtersOpen.update((open) => !open);
   }
 
   protected toggleAll(): void {
