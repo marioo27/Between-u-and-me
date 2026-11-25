@@ -11,6 +11,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { I18nService, Locale } from '../../core/i18n/i18n';
 import {
+  atmosphereMotifs,
+  atmosphereTheme,
+} from './nhie-atmosphere';
+import {
   collectPhrases,
   createDeck,
   drawNext,
@@ -31,6 +35,14 @@ const PROMPT_FILES: Record<Locale, string> = {
   selector: 'app-nhie',
   styleUrl: './nhie.css',
   templateUrl: './nhie.html',
+  host: {
+    '[style.--atmosphere-paper]': 'atmosphere().paper',
+    '[style.--atmosphere-ink]': 'atmosphere().ink',
+    '[style.--color-accent]': 'atmosphere().accent',
+    '[style.--color-accent-2]': 'atmosphere().accent2',
+    '[style.--sticker-fill]': 'atmosphere().sticker',
+    '[style.background]': 'atmosphere().paper',
+  },
 })
 export class Nhie {
   private readonly http = inject(HttpClient);
@@ -95,6 +107,24 @@ export class Nhie {
   protected readonly isEmpty = computed(
     () => this.loadState() === 'ready' && this.poolSize() === 0,
   );
+
+  protected readonly currentCategory = computed(
+    () => this.deck().current?.category ?? null,
+  );
+
+  protected readonly atmosphere = computed(() => {
+    const category = this.currentCategory();
+    const theme = atmosphereTheme(category);
+    return {
+      category,
+      paper: theme.paper,
+      ink: theme.ink,
+      accent: theme.accent,
+      accent2: theme.accent2,
+      sticker: theme.sticker,
+      motifs: atmosphereMotifs(category),
+    };
+  });
 
   constructor() {
     effect((onCleanup) => {

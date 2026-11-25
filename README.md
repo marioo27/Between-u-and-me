@@ -8,7 +8,11 @@
 [![Netlify](https://img.shields.io/badge/Deploy-Netlify-00C7B7?logo=netlify&logoColor=white)](https://www.netlify.com/)
 
 Friends’ game vault — play party games together. First game: **Never Have I Ever** / **Yo Nunca**.
+
 Live app: https://between-u-and-me.netlify.app/
+
+![Home — Between U & Me](docs/screenshots/home.png)
+
 ---
 
 ## English
@@ -21,6 +25,21 @@ A small web app to store and play games with your friend group. The first game i
 - One or more category filters (or all categories)
 - No repeats until every prompt in the current filter has been shown, then the deck reshuffles
 - Spanish / English UI and prompt packs
+- Per-category look: paper tint, floating icons, card colour, overprint pass, and CTA sticker
+
+### Design
+
+**Overprint + Sticker** — newsprint feel, wide display type (Anybody), teal×orange multiply (moss where they overlap), die-cut pink CTA that hangs off the card. In Yo Nunca, each category swaps the palette and the floating line icons.
+
+| Category vibe | Example |
+|---------------|---------|
+| Party | Amber card, floating bottles / notes |
+| Social / tech | Cyan card, phones / @ / signal |
+| (and the rest) | Each bank category has its own paper + accents |
+
+![Yo Nunca — Fiesta](docs/screenshots/nhie-fiesta.png)
+
+![Yo Nunca — Redes](docs/screenshots/nhie-redes.png)
 
 ### Tech stack
 
@@ -42,20 +61,19 @@ A small web app to store and play games with your friend group. The first game i
 
 ```text
 Between-u-and-me/
+├── docs/screenshots/              # README captures
 ├── frontend/                      # Angular app
 │   ├── public/data/
-│   │   ├── yo-nunca.json          # Spanish prompts (served)
-│   │   └── nhie.json              # English prompts (served)
+│   │   ├── yo-nunca.json          # Spanish prompts
+│   │   └── nhie.json              # English prompts
 │   └── src/app/
 │       ├── core/i18n/             # Locale + UI strings
 │       ├── pages/
-│       │   ├── home/              # Landing page
-│       │   └── neverHaveIEver/    # Game screen + deck logic
+│       │   ├── home/              # Landing
+│       │   └── neverHaveIEver/    # Game, deck, category atmosphere
 │       └── shared/
+│           ├── footer/
 │           └── language-bubble/   # ES/EN switcher
-├── backend/                       # Reserved for a future API
-├── yo_nunca.json                  # Source Spanish prompts
-├── nhie.json                      # Source English prompts
 ├── LICENSE
 └── README.md
 ```
@@ -96,7 +114,7 @@ npm test       # Unit tests
 | Build command | `npm run build` |
 | Publish directory | `dist/between-u-and-me/browser` |
 
-For Angular client routes such as `/nhie`, configure an SPA fallback so refreshes do not 404 (`/*` → `/index.html` with status `200`).
+For Angular client routes such as `/nhie`, configure an SPA fallback so refreshes do not 404 (`/*` → `/index.html` with status `200`). The repo already ships `frontend/public/_redirects` for Netlify.
 
 ---
 
@@ -110,6 +128,17 @@ Una web pequeña para guardar y jugar juegos con tu grupo de amigos. El primero 
 - Filtro por una o varias categorías (o todas)
 - Sin repeticiones hasta agotar las frases del filtro; después se baraja de nuevo
 - Interfaz y frases en español e inglés
+- Aspecto por categoría: tinte de fondo, iconos flotantes, color de la carta, pass de overprint y botón sticker
+
+### Diseño
+
+**Overprint + Sticker** — aire de imprenta, tipografía ancha (Anybody), teal×naranja en multiply (moss donde se cruzan), CTA die-cut que sobresale de la carta. En Yo Nunca, cada categoría cambia la paleta y los iconos del fondo.
+
+![Home — Between U & Me](docs/screenshots/home.png)
+
+![Yo Nunca — Fiesta](docs/screenshots/nhie-fiesta.png)
+
+![Yo Nunca — Redes](docs/screenshots/nhie-redes.png)
 
 ### Tecnologías
 
@@ -131,20 +160,19 @@ Una web pequeña para guardar y jugar juegos con tu grupo de amigos. El primero 
 
 ```text
 Between-u-and-me/
+├── docs/screenshots/              # Capturas del README
 ├── frontend/                      # App Angular
 │   ├── public/data/
-│   │   ├── yo-nunca.json          # Frases en español (servidas)
-│   │   └── nhie.json              # Frases en inglés (servidas)
+│   │   ├── yo-nunca.json          # Frases en español
+│   │   └── nhie.json              # Frases en inglés
 │   └── src/app/
 │       ├── core/i18n/             # Idioma + textos de UI
 │       ├── pages/
 │       │   ├── home/              # Portada
-│       │   └── neverHaveIEver/    # Pantalla de juego + lógica del mazo
+│       │   └── neverHaveIEver/    # Juego, mazo, atmósfera por categoría
 │       └── shared/
+│           ├── footer/
 │           └── language-bubble/   # Selector ES/EN
-├── backend/                       # Reservado para una API futura
-├── yo_nunca.json                  # Fuente de frases en español
-├── nhie.json                      # Fuente de frases en inglés
 ├── LICENSE
 └── README.md
 ```
@@ -157,15 +185,15 @@ npm install
 npm start
 ```
 
-Abrí [http://localhost:4200](http://localhost:4200).
+Abre [http://localhost:4200](http://localhost:4200).
 
 ### Cómo se juega
 
-1. Entrá a la home — **Between U & Me**
-2. Pulsá **Yo Nunca**
-3. Elegí una o varias categorías, o **Todas**
-4. Leé la frase y pulsá **Otra frase**
-5. Usá la burbuja de idioma (abajo a la derecha) para cambiar **ES ↔ EN**
+1. Entra en la home — **Between U & Me**
+2. Pulsa **Yo Nunca**
+3. Elige una o varias categorías, o **Todas**
+4. Lee la frase y pulsa **Otra frase**
+5. Usa la burbuja de idioma (abajo a la derecha) para cambiar **ES ↔ EN**
 
 Con inglés seleccionado se cargan las frases de `nhie.json`. Con español, las de `yo-nunca.json`.
 
@@ -185,7 +213,7 @@ npm test       # Tests unitarios
 | Build command | `npm run build` |
 | Publish directory | `dist/between-u-and-me/browser` |
 
-Para rutas de Angular como `/nhie`, configurá un fallback SPA para que al refrescar no dé 404 (`/*` → `/index.html` con estado `200`).
+Para rutas de Angular como `/nhie`, configura un fallback SPA para que al refrescar no dé 404 (`/*` → `/index.html` con estado `200`). El repo incluye `frontend/public/_redirects` para Netlify.
 
 ---
 

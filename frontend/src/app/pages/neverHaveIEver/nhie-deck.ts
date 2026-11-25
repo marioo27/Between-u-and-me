@@ -15,6 +15,11 @@ export const NHIE_CATEGORY_ORDER = [
 
 export type NhieCategoryId = (typeof NHIE_CATEGORY_ORDER)[number];
 
+export interface NhieCard {
+  text: string;
+  category: string;
+}
+
 export function listCategories(bank: NhiePromptBank): string[] {
   const known = NHIE_CATEGORY_ORDER.filter((id) => id in bank);
   const extras = Object.keys(bank).filter((id) => !NHIE_CATEGORY_ORDER.includes(id as NhieCategoryId));
@@ -24,18 +29,20 @@ export function listCategories(bank: NhiePromptBank): string[] {
 export function collectPhrases(
   bank: NhiePromptBank,
   selectedCategories: readonly string[],
-): string[] {
+): NhieCard[] {
   if (selectedCategories.length === 0) {
     return [];
   }
 
-  const phrases: string[] = [];
+  const phrases: NhieCard[] = [];
   for (const category of selectedCategories) {
     const entries = bank[category];
     if (!entries?.length) {
       continue;
     }
-    phrases.push(...entries);
+    for (const text of entries) {
+      phrases.push({ text, category });
+    }
   }
   return phrases;
 }
@@ -51,17 +58,17 @@ export function shuffle<T>(items: readonly T[], rng: () => number = Math.random)
 }
 
 export interface NhieDeckState {
-  /** Remaining phrases in the current cycle (already shuffled). */
-  remaining: string[];
-  /** All phrases matching the active filter (source pool). */
-  pool: string[];
-  current: string | null;
+  /** Remaining cards in the current cycle (already shuffled). */
+  remaining: NhieCard[];
+  /** All cards matching the active filter (source pool). */
+  pool: NhieCard[];
+  current: NhieCard | null;
   /** True when the pool was reshuffled because it was exhausted. */
   reshuffled: boolean;
 }
 
 export function createDeck(
-  pool: readonly string[],
+  pool: readonly NhieCard[],
   rng: () => number = Math.random,
 ): NhieDeckState {
   if (pool.length === 0) {

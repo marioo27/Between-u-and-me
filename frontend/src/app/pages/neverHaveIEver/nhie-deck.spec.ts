@@ -40,19 +40,19 @@ describe('nhie-deck', () => {
       expect(collectPhrases(sampleBank, [])).toEqual([]);
     });
 
-    it('filters phrases to the selected categories', () => {
+    it('filters phrases to the selected categories and keeps category tags', () => {
       expect(collectPhrases(sampleBank, ['amor_y_relaciones', 'otros'])).toEqual([
-        'B1',
-        'C1',
-        'C2',
-        'C3',
+        { text: 'B1', category: 'amor_y_relaciones' },
+        { text: 'C1', category: 'otros' },
+        { text: 'C2', category: 'otros' },
+        { text: 'C3', category: 'otros' },
       ]);
     });
 
     it('skips empty categories without failing', () => {
       expect(collectPhrases(sampleBank, ['vacia', 'sexo_y_sexualidad'])).toEqual([
-        'A1',
-        'A2',
+        { text: 'A1', category: 'sexo_y_sexualidad' },
+        { text: 'A2', category: 'sexo_y_sexualidad' },
       ]);
     });
 
@@ -82,26 +82,30 @@ describe('nhie-deck', () => {
     });
 
     it('draws every phrase once before reshuffling', () => {
-      const pool = ['one', 'two', 'three'];
+      const pool = [
+        { text: 'one', category: 'otros' },
+        { text: 'two', category: 'otros' },
+        { text: 'three', category: 'otros' },
+      ];
       let state = createDeck(pool, sequentialRng([0, 0]));
       const seen = new Set<string>();
 
       expect(state.current).not.toBeNull();
-      seen.add(state.current!);
+      seen.add(state.current!.text);
 
       state = drawNext(state, sequentialRng([0, 0]));
-      seen.add(state.current!);
+      seen.add(state.current!.text);
       expect(state.reshuffled).toBe(false);
 
       state = drawNext(state, sequentialRng([0, 0]));
-      seen.add(state.current!);
+      seen.add(state.current!.text);
       expect(state.reshuffled).toBe(false);
-      expect(seen).toEqual(new Set(pool));
+      expect(seen).toEqual(new Set(pool.map((card) => card.text)));
       expect(state.remaining).toEqual([]);
 
       state = drawNext(state, sequentialRng([0, 0]));
       expect(state.reshuffled).toBe(true);
-      expect(pool).toContain(state.current!);
+      expect(pool.map((card) => card.text)).toContain(state.current!.text);
       expect(state.remaining).toHaveLength(pool.length - 1);
     });
 
