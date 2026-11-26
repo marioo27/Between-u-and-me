@@ -9,7 +9,8 @@
   <img src="https://img.shields.io/badge/License-MIT-2ea44f?style=for-the-badge"/>
 </p>
 
-**Live app:** [https://between-u-and-me.netlify.app](https://between-u-and-me.netlify.app)
+**Live app:** [https://between-u-and-me.netlify.app](https://between-u-and-me.netlify.app)  
+**API:** [https://i-aint-ur-fan.onrender.com](https://i-aint-ur-fan.onrender.com) · health: [`/api/health`](https://i-aint-ur-fan.onrender.com/api/health)
 
 [English](#english) · [Español](#espanol)
 
