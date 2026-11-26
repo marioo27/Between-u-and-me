@@ -10,6 +10,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { I18nService, Locale } from '../../core/i18n/i18n';
+import { SiteMenu } from '../../shared/site-menu/site-menu';
 import {
   atmosphereMotifs,
   atmosphereTheme,
@@ -31,7 +32,7 @@ const PROMPT_FILES: Record<Locale, string> = {
 };
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, SiteMenu],
   selector: 'app-nhie',
   styleUrl: './nhie.css',
   templateUrl: './nhie.html',
@@ -50,11 +51,10 @@ export class Nhie {
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly t = this.i18n.t;
+  protected readonly showHowTo = signal(false);
 
   protected readonly loadState = signal<LoadState>('loading');
   protected readonly bank = signal<NhiePromptBank>({});
-  protected readonly categories = signal<string[]>([]);
-  protected readonly selected = signal<string[]>([]);
   protected readonly deck = signal<NhieDeckState>({
     remaining: [],
     pool: [],
@@ -62,27 +62,6 @@ export class Nhie {
     reshuffled: false,
   });
   protected readonly showReshuffleNote = signal(false);
-  protected readonly filtersOpen = signal(false);
-
-  protected readonly allSelected = computed(() => {
-    const all = this.categories();
-    const selected = this.selected();
-    return all.length > 0 && selected.length === all.length;
-  });
-
-  protected readonly categoriesSummary = computed(() => {
-    const selected = this.selected();
-    if (selected.length === 0) {
-      return this.t().nhieCategoriesSummaryNone;
-    }
-    if (this.allSelected()) {
-      return this.t().nhieCategoriesSummaryAll;
-    }
-    return this.t().nhieCategoriesSummaryCount.replace(
-      '{count}',
-      String(selected.length),
-    );
-  });
 
   protected readonly poolSize = computed(() => this.deck().pool.length);
   protected readonly shownCount = computed(() => {
@@ -143,32 +122,12 @@ export class Nhie {
     });
   }
 
-  protected categoryLabel(id: string): string {
-    return this.i18n.categoryLabel(id);
+  protected openHowTo(): void {
+    this.showHowTo.set(true);
   }
 
-  protected toggleFilters(): void {
-    this.filtersOpen.update((open) => !open);
-  }
-
-  protected toggleAll(): void {
-    if (this.allSelected()) {
-      this.applySelection([]);
-      return;
-    }
-    this.applySelection([...this.categories()]);
-  }
-
-  protected toggleCategory(id: string): void {
-    const current = this.selected();
-    const next = current.includes(id)
-      ? current.filter((item) => item !== id)
-      : [...current, id];
-    this.applySelection(next);
-  }
-
-  protected isSelected(id: string): boolean {
-    return this.selected().includes(id);
+  protected closeHowTo(): void {
+    this.showHowTo.set(false);
   }
 
   protected nextPhrase(): void {
@@ -182,27 +141,9 @@ export class Nhie {
 
   private applyBank(data: NhiePromptBank): void {
     const cats = listCategories(data);
-    const previous = this.selected();
-    const nextSelected =
-      previous.length === 0
-        ? [...cats]
-        : previous.filter((id) => cats.includes(id));
-
     this.bank.set(data);
-    this.categories.set(cats);
-    this.selected.set(nextSelected.length > 0 ? nextSelected : [...cats]);
-    this.rebuildDeck(this.selected());
-    this.loadState.set('ready');
-  }
-
-  private applySelection(next: string[]): void {
-    this.selected.set(next);
-    this.rebuildDeck(next);
-  }
-
-  private rebuildDeck(selectedCategories: string[]): void {
-    const pool = collectPhrases(this.bank(), selectedCategories);
-    this.deck.set(createDeck(pool));
+    this.deck.set(createDeck(collectPhrases(data, cats)));
     this.showReshuffleNote.set(false);
+    this.loadState.set('ready');
   }
 }

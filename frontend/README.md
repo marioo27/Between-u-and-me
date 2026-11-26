@@ -21,6 +21,8 @@ npm test       # Vitest unit tests
 
 ## Notes
 
-- Prompt banks live in `public/data/` (`yo-nunca.json`, `nhie.json`).
+- Games: `/` home catalog, `/nhie` Never Have I Ever, `/impostor` The Impostor.
+- Language + help live in the header **settings menu** (`shared/site-menu`).
+- Prompt / word banks in `public/data/` (`yo-nunca.json`, `nhie.json`, `impostor-es.json`, `impostor-en.json`).
 - SPA redirects for Netlify: `public/_redirects`.
 - Full project docs (EN + ES): [root README](../README.md).

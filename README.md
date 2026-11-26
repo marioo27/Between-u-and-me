@@ -22,40 +22,36 @@
 
 **Public web app** | **Party games for friends** | **No login · No database**
 
-Between U & Me is a small vault of games for your friend group. The first game is **Never Have I Ever** / **Yo Nunca**.
+Between U & Me is a small vault of games for your friend group. Games today:
 
-> Read it out loud. Everyone answers. Keep going until the deck is spent.
+- **Never Have I Ever** / **Yo Nunca** — random prompts, category filters, no repeats until the deck is spent.
+- **The Impostor** — pass-the-phone roles: civilians see a secret word; impostors see a hint, the category, or nothing.
 
-The UI switches between **Spanish** and **English**. Prompt banks follow the selected language.
+Language (ES ↔ EN) lives in the **settings menu (☰)** in the header — not a floating bubble.
 
 ### Screenshots
 
-![Home](docs/screenshots/home.png)
+![Home](docs/screenshots/home-en.png)
 
-![Yo Nunca — party category](docs/screenshots/nhie-fiesta.png)
+![Never Have I Ever — party category](docs/screenshots/nhie-fiesta-en.png)
 
-![Yo Nunca — social / tech category](docs/screenshots/nhie-redes.png)
+![The Impostor — setup](docs/screenshots/impostor-setup-en.png)
 
 ### What you get
 
-- Random prompts from a JSON bank
-- Filter by one or more categories (or all)
-- No repeats until the filtered deck is empty, then it reshuffles
-- Language bubble (bottom-left) for **ES ↔ EN**
-- Look per category: paper tint, floating icons, card colour, overprint pass, and sticker CTA
-
-### Design
-
-**Overprint + Sticker** — newsprint feel, wide display type (Anybody), accent×second-pass multiply (moss where they overlap), die-cut CTA that hangs off the card. In Yo Nunca, each category swaps the palette and the floating line icons.
+- Two separate games from the home catalog
+- Header settings menu: language, game shortcuts, help, about
+- NHIE: JSON prompt banks, multi-category filters, per-category atmosphere
+- Impostor: player names, fixed impostor table, chaos mode, discreet cards, hold-to-flip reveal
+- Static hosting friendly (Netlify SPA redirects)
 
 ### Tech stack
 
 - **Angular 22** — standalone components
 - **TypeScript 5** — app language
-- **CSS tokens** — shared design system (Overprint + Sticker)
-- **Vitest** — unit tests (deck logic)
-- **Static JSON** — prompt banks in `frontend/public/data/`
-- **Node.js 20+** — install, serve, and build
+- **CSS tokens** — Overprint + Sticker
+- **Vitest** — unit tests (deck / deal logic)
+- **Static JSON** — `frontend/public/data/`
 - **Netlify** — static hosting + SPA redirects
 
 ### Run locally
@@ -67,16 +63,6 @@ npm start
 ```
 
 UI: [http://localhost:4200](http://localhost:4200)
-
-### How to play
-
-1. Open the home page
-2. Tap **Yo Nunca** / **Never Have I Ever**
-3. Pick one or more categories, or **All**
-4. Read the prompt and press **Otra frase** / **Next prompt**
-5. Use the language bubble (bottom-left) for **ES ↔ EN**
-
-English loads `nhie.json`. Spanish loads `yo-nunca.json`.
 
 ### Scripts
 
@@ -94,23 +80,23 @@ More detail: [frontend/README.md](frontend/README.md)
 Between-u-and-me/
 ├── docs/
 │   └── screenshots/
-│         ├── home.png
-│         ├── nhie-fiesta.png
-│         └── nhie-redes.png
 ├── frontend/
 │   ├── public/
 │   │   ├── _redirects
 │   │   └── data/
 │   │         ├── yo-nunca.json
-│   │         └── nhie.json
+│   │         ├── nhie.json
+│   │         ├── impostor-es.json
+│   │         └── impostor-en.json
 │   └── src/app/
 │         ├── core/i18n/
 │         ├── pages/
 │         │   ├── home/
-│         │   └── neverHaveIEver/
+│         │   ├── neverHaveIEver/
+│         │   └── impostor/
 │         └── shared/
 │               ├── footer/
-│               └── language-bubble/
+│               └── site-menu/
 ├── LICENSE
 ├── README.md
 └── .gitignore
@@ -124,7 +110,7 @@ Between-u-and-me/
 | Build command | `npm run build` |
 | Publish directory | `dist/between-u-and-me/browser` |
 
-SPA fallback for routes like `/nhie`: `/*` → `/index.html` (`200`). The repo ships `frontend/public/_redirects` for Netlify.
+SPA fallback: `/*` → `/index.html` (`200`). Ships `frontend/public/_redirects`.
 
 ### License
 
@@ -138,41 +124,37 @@ MIT License. See [LICENSE](LICENSE).
 
 **Aplicación web pública** | **Juegos para tu grupo de amigos** | **Sin login · Sin base de datos**
 
-Between U & Me es un almacén pequeño de juegos para tu grupo. El primero es **Yo Nunca** / **Never Have I Ever**.
+Between U & Me es un almacén pequeño de juegos. Ahora mismo:
 
-> Lee en voz alta. Cada uno responde. Sigue hasta agotar el mazo.
+- **Yo Nunca** / **Never Have I Ever** — frases al azar, filtros por categoría, sin repetir hasta agotar el mazo.
+- **El Impostor** — pasar el móvil: los civiles ven la palabra; el impostor ve pista, categoría o nada.
 
-La interfaz se puede cambiar entre **español** e **inglés**. El banco de frases sigue el idioma elegido.
+El idioma (ES ↔ EN) se cambia en el **menú de ajustes (☰)** del header.
 
 ### Capturas
 
-![Portada](docs/screenshots/home.png)
+![Portada](docs/screenshots/home-es.png)
 
-![Yo Nunca — categoría fiesta](docs/screenshots/nhie-fiesta.png)
+![Yo Nunca — categoría fiesta](docs/screenshots/nhie-fiesta-es.png)
 
-![Yo Nunca — categoría redes](docs/screenshots/nhie-redes.png)
+![El Impostor — setup](docs/screenshots/impostor-setup-es.png)
 
 ### Qué incluye
 
-- Frases aleatorias desde un banco JSON
-- Filtro por una o varias categorías (o todas)
-- Sin repeticiones hasta agotar el mazo filtrado; después se baraja de nuevo
-- Burbuja de idioma (abajo a la izquierda) para **ES ↔ EN**
-- Aspecto por categoría: tinte de fondo, iconos flotantes, color de la carta, pass de overprint y CTA sticker
-
-### Diseño
-
-**Overprint + Sticker** — aire de imprenta, tipografía ancha (Anybody), acento×segundo pass en multiply (moss donde se cruzan), CTA die-cut que sobresale de la carta. En Yo Nunca, cada categoría cambia la paleta y los iconos del fondo.
+- Catálogo en home con dos juegos separados
+- Menú ☰: idioma, atajos, ayuda, acerca de
+- Yo Nunca: bancos JSON, filtros, atmósfera por categoría
+- Impostor: nombres, tabla de impostores, caos, modo discreto, carta hold-to-flip
+- Listo para hosting estático (Netlify)
 
 ### Tecnologías
 
 - **Angular 22** — componentes standalone
-- **TypeScript 5** — lenguaje de la app
-- **Tokens CSS** — sistema de diseño compartido (Overprint + Sticker)
-- **Vitest** — tests unitarios (lógica del mazo)
-- **JSON estático** — bancos de frases en `frontend/public/data/`
-- **Node.js 20+** — instalar, servir y construir
-- **Netlify** — hosting estático + redirects SPA
+- **TypeScript 5**
+- **Tokens CSS** — Overprint + Sticker
+- **Vitest** — tests unitarios
+- **JSON estático** — `frontend/public/data/`
+- **Netlify** — hosting + redirects SPA
 
 ### Ejecutar en local
 
@@ -183,16 +165,6 @@ npm start
 ```
 
 Interfaz: [http://localhost:4200](http://localhost:4200)
-
-### Cómo se juega
-
-1. Entra en la home
-2. Pulsa **Yo Nunca**
-3. Elige una o varias categorías, o **Todas**
-4. Lee la frase y pulsa **Otra frase**
-5. Usa la burbuja de idioma (abajo a la izquierda) para **ES ↔ EN**
-
-Con inglés se carga `nhie.json`. Con español, `yo-nunca.json`.
 
 ### Scripts
 
@@ -210,23 +182,23 @@ Más detalle: [frontend/README.md](frontend/README.md)
 Between-u-and-me/
 ├── docs/
 │   └── screenshots/
-│         ├── home.png
-│         ├── nhie-fiesta.png
-│         └── nhie-redes.png
 ├── frontend/
 │   ├── public/
 │   │   ├── _redirects
 │   │   └── data/
 │   │         ├── yo-nunca.json
-│   │         └── nhie.json
+│   │         ├── nhie.json
+│   │         ├── impostor-es.json
+│   │         └── impostor-en.json
 │   └── src/app/
 │         ├── core/i18n/
 │         ├── pages/
 │         │   ├── home/
-│         │   └── neverHaveIEver/
+│         │   ├── neverHaveIEver/
+│         │   └── impostor/
 │         └── shared/
 │               ├── footer/
-│               └── language-bubble/
+│               └── site-menu/
 ├── LICENSE
 ├── README.md
 └── .gitignore
@@ -240,7 +212,7 @@ Between-u-and-me/
 | Build command | `npm run build` |
 | Publish directory | `dist/between-u-and-me/browser` |
 
-Fallback SPA para rutas como `/nhie`: `/*` → `/index.html` (`200`). El repo incluye `frontend/public/_redirects` para Netlify.
+Fallback SPA: `/*` → `/index.html` (`200`). Incluye `frontend/public/_redirects`.
 
 ### Licencia
 

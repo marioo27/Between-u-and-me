@@ -2,10 +2,10 @@
   <header class="masthead">
     <div class="container masthead__bar">
       <a class="wordmark display" href="#top">Between U &amp; Me</a>
-      <nav class="masthead__nav" aria-label="Principal">
-        <a class="masthead__link" href="#momentos">{{ t().homeNavMoments }}</a>
-        <a class="masthead__cta" routerLink="/nhie">{{ t().homeCta }}</a>
-      </nav>
+      <div class="masthead__actions">
+        <a class="masthead__link" href="#juegos">{{ t().homeNavGames }}</a>
+        <app-site-menu />
+      </div>
     </div>
   </header>
 
@@ -15,18 +15,23 @@
         <h1 id="home-title" class="display hero__title">Between U &amp; Me</h1>
         <p class="hero__lead">{{ t().homeLead }}</p>
       </div>
+    </div>
+  </section>
 
-      <div class="stage">
-        <div class="second-pass pass-2" aria-hidden="true"></div>
-        <div class="prompt-card pass-1">
-          <div class="prompt-card__body">
-            <p class="prompt-card__label">{{ t().homeSampleLabel }}</p>
-            <p class="prompt-card__text display">{{ t().homeSamplePrompt }}</p>
-            <div class="prompt-card__row">
-              <a class="die" routerLink="/nhie">{{ t().homePlay }}</a>
-            </div>
-          </div>
-        </div>
+  <section class="games" id="juegos" aria-labelledby="games-title">
+    <div class="container">
+      <h2 id="games-title" class="display games__title">{{ t().homeGamesTitle }}</h2>
+      <div class="games__grid">
+        <article class="game-block">
+          <h3 class="display game-block__title">{{ t().homeNhieTitle }}</h3>
+          <p class="game-block__blurb">{{ t().homeNhieBlurb }}</p>
+          <a class="die" routerLink="/nhie">{{ t().homeNhiePlay }}</a>
+        </article>
+        <article class="game-block">
+          <h3 class="display game-block__title">{{ t().homeImpostorTitle }}</h3>
+          <p class="game-block__blurb">{{ t().homeImpostorBlurb }}</p>
+          <a class="die" routerLink="/impostor">{{ t().homeImpostorPlay }}</a>
+        </article>
       </div>
     </div>
   </section>
@@ -58,18 +63,6 @@
     <div class="container">
       <h2 id="close-title" class="display close__title">{{ t().homeCloseTitle }}</h2>
       <p class="close__lead">{{ t().homeCloseLead }}</p>
-      <div class="close__stage">
-        <div class="second-pass pass-2" aria-hidden="true"></div>
-        <div class="prompt-card pass-1">
-          <div class="prompt-card__body">
-            <p class="prompt-card__label">{{ t().homeSampleLabel }}</p>
-            <p class="prompt-card__text display">{{ t().homeClosePrompt }}</p>
-            <div class="prompt-card__row">
-              <a class="die" routerLink="/nhie">{{ t().nhieNext }}</a>
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </section>
 </main>

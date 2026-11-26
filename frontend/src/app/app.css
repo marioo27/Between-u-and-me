@@ -2,17 +2,14 @@
   display: flex;
   flex-direction: column;
   min-height: 100dvh;
-  /* Room above the fixed language bubble when scrolling to the end */
   padding-bottom: max(0.5rem, env(safe-area-inset-bottom, 0px));
 }
 
-:host > :not(app-footer):not(app-language-bubble) {
-  flex: 1 0 auto;
+/* Outlet is only a marker; don't let it eat flex space */
+:host > router-outlet {
+  display: none;
 }
 
-app-footer {
-  position: relative;
-  z-index: 1;
-  flex: 0 0 auto;
-  margin-top: auto;
+:host > :not(router-outlet) {
+  flex: 1 0 auto;
 }

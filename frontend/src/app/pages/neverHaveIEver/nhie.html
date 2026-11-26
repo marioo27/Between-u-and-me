@@ -9,6 +9,8 @@
         [style.--duration]="motif.duration + 's'"
         [style.--delay]="motif.delay + 's'"
         [style.--drift]="motif.drift + 'deg'"
+        [style.--tx]="motif.travelX + 'rem'"
+        [style.--ty]="motif.travelY + 'rem'"
       >
         <svg class="atmosphere__icon" viewBox="0 0 64 64" focusable="false">
           @switch (motif.icon) {
@@ -155,6 +157,7 @@
     <div class="container game__bar-inner">
       <a class="game__back" routerLink="/">{{ t().nhieBack }}</a>
       <h1 class="display game__title">{{ t().nhieTitle }}</h1>
+      <app-site-menu />
     </div>
   </header>
 
@@ -170,52 +173,9 @@
     }
 
     @if (loadState() === 'ready') {
-      <div class="game__filters">
-        <button
-          type="button"
-          class="game__filters-toggle"
-          [attr.aria-expanded]="filtersOpen()"
-          aria-controls="nhie-category-panel"
-          (click)="toggleFilters()"
-        >
-          <span class="game__filters-toggle-text">
-            <span class="game__filters-toggle-label">{{ t().nhieCategoriesLabel }}</span>
-            <span class="game__filters-toggle-summary">{{ categoriesSummary() }}</span>
-          </span>
-          <span class="game__filters-chevron" aria-hidden="true"></span>
-        </button>
-
-        @if (filtersOpen()) {
-          <div
-            id="nhie-category-panel"
-            class="game__chips"
-            role="group"
-            [attr.aria-label]="t().nhieCategoriesLabel"
-          >
-            <button
-              type="button"
-              class="game__chip"
-              [class.game__chip--active]="allSelected()"
-              [attr.aria-pressed]="allSelected()"
-              (click)="toggleAll()"
-            >
-              {{ t().nhieAllCategories }}
-            </button>
-
-            @for (category of categories(); track category) {
-              <button
-                type="button"
-                class="game__chip"
-                [class.game__chip--active]="isSelected(category)"
-                [attr.aria-pressed]="isSelected(category)"
-                (click)="toggleCategory(category)"
-              >
-                {{ categoryLabel(category) }}
-              </button>
-            }
-          </div>
-        }
-      </div>
+      <button type="button" class="game__howto linkish" (click)="openHowTo()">
+        {{ t().menuHowToPlay }}
+      </button>
 
       @if (isEmpty()) {
         <p class="game__status game__status--empty" role="status">
@@ -242,4 +202,15 @@
       }
     }
   </section>
+
+  @if (showHowTo()) {
+    <div class="modal" role="dialog" [attr.aria-label]="t().nhieHowToTitle">
+      <div class="modal__card">
+        <h2 class="display">{{ t().nhieHowToTitle }}</h2>
+        <pre class="modal__body">{{ t().nhieHowToBody }}</pre>
+        <button type="button" class="die" (click)="closeHowTo()">OK</button>
+      </div>
+      <button type="button" class="modal__backdrop" [attr.aria-label]="t().menuClose" (click)="closeHowTo()"></button>
+    </div>
+  }
 </main>

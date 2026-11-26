@@ -1,0 +1,288 @@
+<main class="game">
+  <header class="game__bar">
+    <div class="container game__bar-inner">
+      <a class="game__back" routerLink="/">{{ t().impostorBack }}</a>
+      <h1 class="display game__title">{{ t().impostorTitle }}</h1>
+      <app-site-menu />
+    </div>
+  </header>
+
+  <section class="game__panel container">
+    @if (phase() !== 'setup') {
+      <button type="button" class="game__end" (click)="beginEnd()">
+        {{ t().impostorEnd }}
+      </button>
+    }
+
+    @if (loadState() === 'loading') {
+      <p class="game__status" role="status">{{ t().impostorLoading }}</p>
+    }
+    @if (loadState() === 'error') {
+      <p class="game__status game__status--error" role="alert">{{ t().impostorError }}</p>
+    }
+
+    @if (phase() === 'setup' && loadState() === 'ready') {
+      <div class="setup">
+        <button type="button" class="setup__howto linkish" (click)="openHowTo()">
+          {{ t().impostorHowToPlay }}
+        </button>
+
+        <section class="setup__block">
+          <h2 class="setup__heading">{{ t().impostorPlayers }}</h2>
+          <div class="setup__add">
+            <input
+              class="setup__input"
+              type="text"
+              [value]="nameDraft()"
+              [attr.placeholder]="t().impostorNamePlaceholder"
+              (input)="onNameInput($any($event.target).value)"
+              (keydown.enter)="$event.preventDefault(); addName()"
+            />
+            <button type="button" class="die setup__add-btn" (click)="addName()">
+              {{ t().impostorAdd }}
+            </button>
+          </div>
+          <ul class="setup__names" #namesList>
+            @for (player of players(); track player.id) {
+              <li
+                class="setup__name-row"
+                [attr.data-name-index]="$index"
+                [attr.data-name-id]="player.id"
+                [class.setup__name-row--dragging]="dragFrom() === $index"
+              >
+                <button
+                  type="button"
+                  class="setup__drag"
+                  [attr.aria-label]="t().impostorReorder"
+                  (pointerdown)="startReorder($index, $event)"
+                  (pointermove)="moveReorder($event)"
+                  (pointerup)="endReorder()"
+                  (pointercancel)="endReorder()"
+                >
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                  <span aria-hidden="true"></span>
+                </button>
+                <span class="setup__name">{{ player.name.length ? player.name : '·' }}</span>
+                <button type="button" class="setup__remove" (click)="removeName($index)">
+                  {{ t().impostorRemove }}
+                </button>
+              </li>
+            }
+          </ul>
+          @if (players().length < 3) {
+            <p class="setup__note">{{ t().impostorNeedPlayers }}</p>
+          }
+        </section>
+
+        <section class="setup__block">
+          <h2 class="setup__heading">{{ t().impostorCategories }}</h2>
+          <div class="setup__chips">
+            <button
+              type="button"
+              class="chip"
+              [class.chip--active]="allCategoriesSelected()"
+              (click)="toggleAllCategories()"
+            >
+              {{ t().impostorAllCategories }}
+            </button>
+            @for (cat of categories(); track cat) {
+              <button
+                type="button"
+                class="chip"
+                [class.chip--active]="isCategorySelected(cat)"
+                (click)="toggleCategory(cat)"
+              >
+                {{ categoryLabel(cat) }}
+              </button>
+            }
+          </div>
+        </section>
+
+        <section class="setup__block">
+          <h2 class="setup__heading">{{ t().impostorImpostors }}</h2>
+          <p class="setup__note">
+            {{ t().impostorImpostorsHint.replace('{max}', '' + maxImp()) }}
+          </p>
+          <input
+            class="setup__range"
+            type="range"
+            min="1"
+            [max]="maxImp() || 1"
+            [value]="selectedImpostors()"
+            [disabled]="maxImp() < 1"
+            (input)="setImpostors(+$any($event.target).value)"
+          />
+          <p class="setup__value">{{ selectedImpostors() }}</p>
+          <label class="setup__check">
+            <input type="checkbox" [checked]="chaos()" (change)="chaos.set($any($event.target).checked)" />
+            <span>
+              <strong>{{ t().impostorChaos }}</strong>
+              — {{ t().impostorChaosHint }}
+            </span>
+          </label>
+        </section>
+
+        <section class="setup__block">
+          <h2 class="setup__heading">{{ t().impostorHintMode }}</h2>
+          <div class="setup__chips">
+            <button type="button" class="chip" [class.chip--active]="hintMode() === 'none'" (click)="setHintMode('none')">
+              {{ t().impostorHintNone }}
+            </button>
+            <button type="button" class="chip" [class.chip--active]="hintMode() === 'hint'" (click)="setHintMode('hint')">
+              {{ t().impostorHintWord }}
+            </button>
+            <button type="button" class="chip" [class.chip--active]="hintMode() === 'category'" (click)="setHintMode('category')">
+              {{ t().impostorHintCategory }}
+            </button>
+          </div>
+        </section>
+
+        <section class="setup__block">
+          <h2 class="setup__heading">{{ t().impostorOrder }}</h2>
+          <div class="setup__chips">
+            <button type="button" class="chip" [class.chip--active]="orderMode() === 'list'" (click)="setOrderMode('list')">
+              {{ t().impostorOrderList }}
+            </button>
+            <button type="button" class="chip" [class.chip--active]="orderMode() === 'random'" (click)="setOrderMode('random')">
+              {{ t().impostorOrderRandom }}
+            </button>
+          </div>
+        </section>
+
+        <section class="setup__block">
+          <label class="setup__check">
+            <input type="checkbox" [checked]="discreet()" (change)="discreet.set($any($event.target).checked)" />
+            <span>
+              <strong>{{ t().impostorDiscreet }}</strong>
+              — {{ t().impostorDiscreetHint }}
+            </span>
+          </label>
+        </section>
+
+        <button type="button" class="die setup__start" [disabled]="!canStart()" (click)="startRound()">
+          {{ t().impostorStart }}
+        </button>
+      </div>
+    }
+
+    @if (phase() === 'reveal' && currentPlayer(); as player) {
+      <div class="reveal">
+        <p class="reveal__pass">{{ t().impostorPassTo }}</p>
+        <p class="display reveal__name">{{ player.name.length ? player.name : '·' }}</p>
+        <p class="reveal__hint">{{ t().impostorHold }}</p>
+
+        <button
+          type="button"
+          class="flip-card"
+          [class.flip-card--open]="holding()"
+          [class.flip-card--impostor]="holding() && player.isImpostor && !round()?.discreet"
+          [class.flip-card--civilian]="holding() && !player.isImpostor && !round()?.discreet"
+          [class.flip-card--discreet]="!!round()?.discreet"
+          (pointerdown)="holdStart($event)"
+          (pointerup)="holdEnd()"
+          (pointerleave)="holdEnd()"
+          (pointercancel)="holdEnd()"
+        >
+          <span class="flip-card__face flip-card__face--back">
+            {{ player.name.length ? player.name : '·' }}
+          </span>
+          <span class="flip-card__face flip-card__face--front">
+            @if (player.isImpostor) {
+              <span class="flip-card__role flip-card__role--impostor">{{ t().impostorRoleImpostor }}</span>
+              @if (player.revealHintMode === 'category') {
+                <span class="flip-card__meta">
+                  {{ t().impostorCategoryLabel }}:
+                  {{ categoryLabel(player.revealCategory ?? '') }}
+                </span>
+              }
+              @if (player.revealHintMode === 'hint' && player.revealHintWord) {
+                <span class="flip-card__meta">
+                  {{ t().impostorHintLabel }}: {{ player.revealHintWord }}
+                </span>
+              }
+            } @else {
+              <span class="flip-card__word">{{ player.revealWord }}</span>
+            }
+          </span>
+        </button>
+
+        @if (isLastReveal()) {
+          <button
+            type="button"
+            class="die"
+            [disabled]="!hasRevealed()"
+            (click)="goStartGame()"
+          >
+            {{ t().impostorStartGame }}
+          </button>
+        } @else {
+          <button
+            type="button"
+            class="die"
+            [disabled]="!hasRevealed()"
+            (click)="nextReveal()"
+          >
+            {{ t().impostorNext }}
+          </button>
+        }
+      </div>
+    }
+
+    @if (phase() === 'play' && round(); as live) {
+      <div class="play play--start">
+        <p class="play__starts">{{ t().impostorStarter }}</p>
+        <p class="display play__starts-name">{{ starterName() }}</p>
+        <button type="button" class="die" (click)="revealImpostors()">
+          {{ t().impostorReveal }}
+        </button>
+      </div>
+    }
+
+    @if (phase() === 'revealed') {
+      <div class="play play--revealed">
+        <p class="play__impostors-title">{{ t().impostorRevealed }}</p>
+        @if (impostorNames().length === 0) {
+          <p class="play__impostors-name">{{ t().impostorNone }}</p>
+        } @else if (impostorNames().length === names().length) {
+          <p class="play__impostors-name">{{ t().impostorAll }}</p>
+        } @else {
+          <ul class="play__impostors-list">
+            @for (name of impostorNames(); track $index) {
+              <li class="play__impostors-name">{{ name.length ? name : '·' }}</li>
+            }
+          </ul>
+        }
+        <button type="button" class="die" (click)="newRound()">{{ t().impostorNewRound }}</button>
+      </div>
+    }
+  </section>
+
+  @if (showHowTo()) {
+    <div class="modal" role="dialog" [attr.aria-label]="t().impostorHowToTitle">
+      <div class="modal__card">
+        <h2 class="display">{{ t().impostorHowToTitle }}</h2>
+        <pre class="modal__body">{{ t().impostorHowToBody }}</pre>
+        <button type="button" class="die" (click)="closeHowTo()">OK</button>
+      </div>
+      <button type="button" class="modal__backdrop" aria-label="Close" (click)="closeHowTo()"></button>
+    </div>
+  }
+
+  @if (endConfirm() !== 'idle') {
+    <div class="modal" role="dialog">
+      <div class="modal__card">
+        <h2 class="display">
+          {{ endConfirm() === 'one' ? t().impostorEndConfirm1 : t().impostorEndConfirm2 }}
+        </h2>
+        <div class="modal__actions">
+          <button type="button" class="die" (click)="cancelEnd()">{{ t().impostorEndNo }}</button>
+          <button type="button" class="modal__danger" (click)="confirmEndStep()">
+            {{ t().impostorEndYes }}
+          </button>
+        </div>
+      </div>
+      <button type="button" class="modal__backdrop" (click)="cancelEnd()"></button>
+    </div>
+  }
+</main>

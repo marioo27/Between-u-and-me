@@ -1,0 +1,76 @@
+<div class="site-menu" [class.site-menu--open]="open()">
+  <button
+    type="button"
+    class="site-menu__trigger"
+    [attr.aria-expanded]="open()"
+    aria-haspopup="menu"
+    [attr.aria-label]="t().menuOpen"
+    (click)="toggle()"
+  >
+    <span class="site-menu__bars" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </span>
+  </button>
+
+  @if (open()) {
+    <div class="site-menu__panel" role="menu" [attr.aria-label]="t().menuTitle">
+      <section class="site-menu__section">
+        <h2 class="site-menu__heading">{{ t().langLabel }}</h2>
+        <div class="site-menu__row" role="group" [attr.aria-label]="t().langLabel">
+          <button
+            type="button"
+            class="site-menu__chip"
+            role="menuitemradio"
+            [attr.aria-checked]="locale() === 'es'"
+            [class.site-menu__chip--active]="locale() === 'es'"
+            (click)="chooseLocale('es')"
+          >
+            {{ t().langEs }}
+          </button>
+          <button
+            type="button"
+            class="site-menu__chip"
+            role="menuitemradio"
+            [attr.aria-checked]="locale() === 'en'"
+            [class.site-menu__chip--active]="locale() === 'en'"
+            (click)="chooseLocale('en')"
+          >
+            {{ t().langEn }}
+          </button>
+        </div>
+      </section>
+
+      <section class="site-menu__section">
+        <a class="site-menu__link" role="menuitem" routerLink="/" (click)="close()">
+          {{ t().menuHome }}
+        </a>
+      </section>
+
+      <section class="site-menu__section">
+        <h2 class="site-menu__heading">{{ t().menuGames }}</h2>
+        <a class="site-menu__link site-menu__link--nested" role="menuitem" routerLink="/nhie" (click)="close()">
+          {{ t().menuNhie }}
+        </a>
+        <a class="site-menu__link site-menu__link--nested" role="menuitem" routerLink="/impostor" (click)="close()">
+          {{ t().menuImpostor }}
+        </a>
+      </section>
+
+      <section class="site-menu__section">
+        <h2 class="site-menu__heading">{{ t().menuCredits }}</h2>
+        <p class="site-menu__hint">{{ t().footerCredit }}</p>
+      </section>
+    </div>
+  }
+</div>
+
+@if (open()) {
+  <button
+    type="button"
+    class="site-menu__backdrop"
+    [attr.aria-label]="t().menuClose"
+    (click)="close()"
+  ></button>
+}

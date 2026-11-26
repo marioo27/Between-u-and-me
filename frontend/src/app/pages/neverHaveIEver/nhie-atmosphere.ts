@@ -50,6 +50,10 @@ export interface AtmosphereMotif {
   delay: number;
   /** Max rotation drift (deg). */
   drift: number;
+  /** Travel on X while floating (rem). */
+  travelX: number;
+  /** Travel on Y while floating (rem). */
+  travelY: number;
 }
 
 export interface AtmosphereTheme {
@@ -66,20 +70,14 @@ export interface AtmosphereTheme {
   sticker: string;
 }
 
-const LAYOUTS: ReadonlyArray<Omit<AtmosphereMotif, 'id' | 'icon'>> = [
-  { x: 8, y: 12, size: 2.4, duration: 14, delay: 0, drift: 12 },
-  { x: 78, y: 8, size: 1.8, duration: 11, delay: -2, drift: -10 },
-  { x: 18, y: 42, size: 2.1, duration: 16, delay: -4, drift: 8 },
-  { x: 88, y: 36, size: 2.6, duration: 13, delay: -1, drift: -14 },
-  { x: 6, y: 72, size: 1.9, duration: 15, delay: -6, drift: 10 },
-  { x: 72, y: 68, size: 2.3, duration: 12, delay: -3, drift: -8 },
-  { x: 42, y: 18, size: 1.6, duration: 17, delay: -5, drift: 16 },
-  { x: 54, y: 78, size: 2.0, duration: 14, delay: -7, drift: -12 },
-  { x: 30, y: 58, size: 1.7, duration: 18, delay: -2.5, drift: 9 },
-  { x: 92, y: 82, size: 1.5, duration: 10, delay: -8, drift: -6 },
-  { x: 48, y: 48, size: 2.2, duration: 19, delay: -1.5, drift: 11 },
-  { x: 14, y: 88, size: 1.8, duration: 13, delay: -4.5, drift: -9 },
-];
+/** How many instances of each category icon float on screen. */
+const COPIES_PER_ICON = 3;
+
+/** Minimum centre-to-centre distance in % of the viewport. */
+const MIN_DISTANCE_PCT = 14;
+
+/** Visible float radius (rem); kept under ~half min gap so icons don’t collide. */
+const MAX_TRAVEL_REM = 3.25;
 
 export const ATMOSPHERE_THEMES: Record<string, AtmosphereTheme> = {
   sexo_y_sexualidad: {
@@ -173,12 +171,114 @@ export function atmosphereTheme(category: string | null | undefined): Atmosphere
   return ATMOSPHERE_THEMES[category] ?? FALLBACK_THEME;
 }
 
+function hashSeed(input: string): number {
+  let h = 2166136261;
+  for (let i = 0; i < input.length; i += 1) {
+    h ^= input.charCodeAt(i);
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/** Deterministic [0, 1) from a mutating seed box. */
+function nextUnit(seed: { value: number }): number {
+  seed.value = (Math.imul(seed.value, 1664525) + 1013904223) >>> 0;
+  return seed.value / 0x100000000;
+}
+
+function dist(a: { x: number; y: number }, b: { x: number; y: number }): number {
+  const dx = a.x - b.x;
+  const dy = a.y - b.y;
+  return Math.hypot(dx, dy);
+}
+
+/**
+ * Scatter centres across the full viewport (including header/footer bands)
+ * with a minimum distance so float paths won’t overlap.
+ */
+function placePoints(
+  count: number,
+  seed: { value: number },
+  minDistance: number,
+): Array<{ x: number; y: number }> {
+  const points: Array<{ x: number; y: number }> = [];
+  // Full-bleed: allow centres into top/bottom chrome so icons drift through.
+  const xMin = 3;
+  const xMax = 97;
+  const yMin = 2;
+  const yMax = 98;
+
+  for (let i = 0; i < count; i += 1) {
+    let placed: { x: number; y: number } | null = null;
+    let gap = minDistance;
+    for (let attempt = 0; attempt < 80; attempt += 1) {
+      const candidate = {
+        x: xMin + nextUnit(seed) * (xMax - xMin),
+        y: yMin + nextUnit(seed) * (yMax - yMin),
+      };
+      if (points.every((p) => dist(p, candidate) >= gap)) {
+        placed = candidate;
+        break;
+      }
+      if (attempt > 0 && attempt % 20 === 0) {
+        gap = Math.max(6, gap * 0.85);
+      }
+    }
+    points.push(
+      placed ?? {
+        x: xMin + ((i * 37) % (xMax - xMin)),
+        y: yMin + ((i * 53) % (yMax - yMin)),
+      },
+    );
+  }
+  return points;
+}
+
 export function atmosphereMotifs(category: string | null | undefined): AtmosphereMotif[] {
   const theme = atmosphereTheme(category);
   const icons = theme.icons;
-  return LAYOUTS.map((slot, index) => ({
-    ...slot,
-    id: `${category ?? 'otros'}-${index}`,
-    icon: icons[index % icons.length]!,
-  }));
+  const key = category ?? 'otros';
+  const seed = { value: hashSeed(`atm:${key}`) };
+
+  const roster: AtmosphereIcon[] = [];
+  for (const icon of icons) {
+    for (let copy = 0; copy < COPIES_PER_ICON; copy += 1) {
+      roster.push(icon);
+    }
+  }
+
+  // Mild shuffle (seeded) so copies aren’t clustered by icon type.
+  for (let i = roster.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(nextUnit(seed) * (i + 1));
+    const tmp = roster[i]!;
+    roster[i] = roster[j]!;
+    roster[j] = tmp;
+  }
+
+  const points = placePoints(roster.length, seed, MIN_DISTANCE_PCT);
+
+  return roster.map((icon, index) => {
+    const point = points[index]!;
+    const size = 1.55 + nextUnit(seed) * 1.15;
+    const duration = 7 + nextUnit(seed) * 6;
+    const delay = -nextUnit(seed) * 8;
+    const drift = (nextUnit(seed) * 2 - 1) * 22;
+    // Prefer a clear travel magnitude so motion reads on screen.
+    const travelX =
+      (nextUnit(seed) < 0.5 ? -1 : 1) * (1.4 + nextUnit(seed) * (MAX_TRAVEL_REM - 1.4));
+    const travelY =
+      (nextUnit(seed) < 0.5 ? -1 : 1) * (1.4 + nextUnit(seed) * (MAX_TRAVEL_REM - 1.4));
+    return {
+      id: `${key}-${icon}-${index}`,
+      icon,
+      x: Math.round(point.x * 10) / 10,
+      y: Math.round(point.y * 10) / 10,
+      size: Math.round(size * 100) / 100,
+      duration: Math.round(duration * 10) / 10,
+      delay: Math.round(delay * 10) / 10,
+      drift: Math.round(drift),
+      travelX: Math.round(travelX * 100) / 100,
+      travelY: Math.round(travelY * 100) / 100,
+    };
+  });
 }
