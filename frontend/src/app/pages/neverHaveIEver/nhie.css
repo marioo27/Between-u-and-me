@@ -317,13 +317,66 @@
 }
 
 @media (max-width: 40rem) {
+  .game__panel {
+    padding-block: var(--space-xl) calc(var(--space-2xl) + 2.5rem);
+  }
+
+  .game__bar-inner {
+    gap: var(--space-sm);
+  }
+
+  .game__title {
+    font-size: clamp(1.35rem, 7vw, 1.85rem);
+  }
+
+  .game__stage {
+    padding: 0 1.15rem 1.15rem 0;
+  }
+
   .game__card {
     padding: var(--space-lg);
   }
 
+  .second-pass {
+    width: 5.75rem;
+    height: 4.5rem;
+  }
+
+  .prompt-card__text {
+    max-width: none;
+    font-size: clamp(1.35rem, 6.2vw, 1.85rem);
+  }
+
+  .prompt-card__row {
+    margin-bottom: calc((var(--space-lg) + 1.35rem) * -1);
+  }
+
   .die {
     width: auto;
+    max-width: 100%;
     padding: var(--space-sm) var(--space-lg);
     font-size: var(--text-md);
+  }
+
+  .game__chip {
+    min-height: 2.5rem;
+    padding-inline: var(--space-sm);
+  }
+
+  .atmosphere__motif {
+    width: calc(var(--size) * 0.7);
+    height: calc(var(--size) * 0.7);
+    opacity: 0.26;
+  }
+}
+
+@media (max-width: 22rem) {
+  .game__stage {
+    padding: 0 0.85rem 0.85rem 0;
+  }
+
+  .second-pass {
+    width: 4.75rem;
+    height: 3.75rem;
   }
 }

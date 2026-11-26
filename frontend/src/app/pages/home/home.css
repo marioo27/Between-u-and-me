@@ -237,12 +237,62 @@
 }
 
 @media (max-width: 40rem) {
+  .hero {
+    padding-block: var(--space-lg) var(--space-xl);
+  }
+
+  .hero__title {
+    font-size: clamp(1.75rem, 9vw, 2.5rem);
+    max-width: none;
+  }
+
+  .stage,
+  .close__stage {
+    padding: 0 1.15rem 1.15rem 0;
+  }
+
   .prompt-card {
     padding: var(--space-lg);
   }
 
+  .second-pass {
+    width: 5.75rem;
+    height: 4.5rem;
+  }
+
+  .prompt-card__text {
+    max-width: none;
+    font-size: clamp(1.35rem, 6.2vw, 1.85rem);
+  }
+
+  .prompt-card__row {
+    margin-bottom: calc((var(--space-lg) + 1.35rem) * -1);
+  }
+
   .die {
+    max-width: 100%;
     padding: var(--space-sm) var(--space-lg);
     font-size: var(--text-md);
+  }
+
+  .moments,
+  .close {
+    padding-block: var(--space-2xl);
+  }
+
+  .bill {
+    padding: var(--space-lg) var(--space-xl) var(--space-xl) var(--space-lg);
+  }
+}
+
+@media (max-width: 22rem) {
+  .stage,
+  .close__stage {
+    padding: 0 0.85rem 0.85rem 0;
+  }
+
+  .second-pass {
+    width: 4.75rem;
+    height: 3.75rem;
   }
 }

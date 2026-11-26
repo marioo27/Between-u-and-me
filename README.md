@@ -1,84 +1,63 @@
 # Between U & Me
 
-[![Angular](https://img.shields.io/badge/Angular-22-DD0031?logo=angular&logoColor=white)](https://angular.dev/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-[![Node.js](https://img.shields.io/badge/Node.js-20+-339933?logo=nodedotjs&logoColor=white)](https://nodejs.org/)
-[![Vitest](https://img.shields.io/badge/Tests-Vitest-6E9F18?logo=vitest&logoColor=white)](https://vitest.dev/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](./LICENSE)
-[![Netlify](https://img.shields.io/badge/Deploy-Netlify-00C7B7?logo=netlify&logoColor=white)](https://www.netlify.com/)
+<p align="left">
+  <img src="https://img.shields.io/badge/Angular-22-DD0031?style=for-the-badge&logo=angular&logoColor=white"/>
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Node.js-20%2B-339933?style=for-the-badge&logo=nodedotjs&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Vitest-Tests-6E9F18?style=for-the-badge&logo=vitest&logoColor=white"/>
+  <img src="https://img.shields.io/badge/Deploy-Netlify-00C7B7?style=for-the-badge&logo=netlify&logoColor=white"/>
+  <img src="https://img.shields.io/badge/License-MIT-2ea44f?style=for-the-badge"/>
+</p>
 
-Friends’ game vault — play party games together. First game: **Never Have I Ever** / **Yo Nunca**.
+**Live app:** [https://between-u-and-me.netlify.app](https://between-u-and-me.netlify.app)
 
-Live app: https://between-u-and-me.netlify.app/
-
-![Home — Between U & Me](docs/screenshots/home.png)
+[English](#english) · [Español](#espanol)
 
 ---
 
+<a id="english"></a>
+
 ## English
 
-### What it is
+**Public web app** | **Party games for friends** | **No login · No database**
 
-A small web app to store and play games with your friend group. The first game is **Never Have I Ever**, with:
+Between U & Me is a small vault of games for your friend group. The first game is **Never Have I Ever** / **Yo Nunca**.
+
+> Read it out loud. Everyone answers. Keep going until the deck is spent.
+
+The UI switches between **Spanish** and **English**. Prompt banks follow the selected language.
+
+### Screenshots
+
+![Home](docs/screenshots/home.png)
+
+![Yo Nunca — party category](docs/screenshots/nhie-fiesta.png)
+
+![Yo Nunca — social / tech category](docs/screenshots/nhie-redes.png)
+
+### What you get
 
 - Random prompts from a JSON bank
-- One or more category filters (or all categories)
-- No repeats until every prompt in the current filter has been shown, then the deck reshuffles
-- Spanish / English UI and prompt packs
-- Per-category look: paper tint, floating icons, card colour, overprint pass, and CTA sticker
+- Filter by one or more categories (or all)
+- No repeats until the filtered deck is empty, then it reshuffles
+- Language bubble (bottom-left) for **ES ↔ EN**
+- Look per category: paper tint, floating icons, card colour, overprint pass, and sticker CTA
 
 ### Design
 
-**Overprint + Sticker** — newsprint feel, wide display type (Anybody), teal×orange multiply (moss where they overlap), die-cut pink CTA that hangs off the card. In Yo Nunca, each category swaps the palette and the floating line icons.
-
-| Category vibe | Example |
-|---------------|---------|
-| Party | Amber card, floating bottles / notes |
-| Social / tech | Cyan card, phones / @ / signal |
-| (and the rest) | Each bank category has its own paper + accents |
-
-![Yo Nunca — Fiesta](docs/screenshots/nhie-fiesta.png)
-
-![Yo Nunca — Redes](docs/screenshots/nhie-redes.png)
+**Overprint + Sticker** — newsprint feel, wide display type (Anybody), accent×second-pass multiply (moss where they overlap), die-cut CTA that hangs off the card. In Yo Nunca, each category swaps the palette and the floating line icons.
 
 ### Tech stack
 
-| Area | Choice |
-|------|--------|
-| Framework | Angular 22 (standalone components) |
-| Language | TypeScript |
-| Styling | CSS with shared design tokens |
-| Tests | Vitest |
-| Data | Static JSON prompt banks |
-| Hosting | Static build (Netlify-ready) |
+- **Angular 22** — standalone components
+- **TypeScript 5** — app language
+- **CSS tokens** — shared design system (Overprint + Sticker)
+- **Vitest** — unit tests (deck logic)
+- **Static JSON** — prompt banks in `frontend/public/data/`
+- **Node.js 20+** — install, serve, and build
+- **Netlify** — static hosting + SPA redirects
 
-### Requirements
-
-- **Node.js** 20 or newer
-- **npm** 10 or newer
-
-### Project structure
-
-```text
-Between-u-and-me/
-├── docs/screenshots/              # README captures
-├── frontend/                      # Angular app
-│   ├── public/data/
-│   │   ├── yo-nunca.json          # Spanish prompts
-│   │   └── nhie.json              # English prompts
-│   └── src/app/
-│       ├── core/i18n/             # Locale + UI strings
-│       ├── pages/
-│       │   ├── home/              # Landing
-│       │   └── neverHaveIEver/    # Game, deck, category atmosphere
-│       └── shared/
-│           ├── footer/
-│           └── language-bubble/   # ES/EN switcher
-├── LICENSE
-└── README.md
-```
-
-### How to run locally
+### Run locally
 
 ```bash
 cd frontend
@@ -86,24 +65,54 @@ npm install
 npm start
 ```
 
-Open [http://localhost:4200](http://localhost:4200).
+UI: [http://localhost:4200](http://localhost:4200)
 
 ### How to play
 
-1. Open the home page — **Between U & Me**
-2. Click **Never Have I Ever** / **Yo Nunca**
-3. Select one or more categories, or **All**
-4. Read the prompt and press **Next prompt** / **Otra frase**
-5. Use the language bubble (bottom-right) to switch **ES ↔ EN**
+1. Open the home page
+2. Tap **Yo Nunca** / **Never Have I Ever**
+3. Pick one or more categories, or **All**
+4. Read the prompt and press **Otra frase** / **Next prompt**
+5. Use the language bubble (bottom-left) for **ES ↔ EN**
 
-When English is selected, prompts load from `nhie.json`. When Spanish is selected, they load from `yo-nunca.json`.
+English loads `nhie.json`. Spanish loads `yo-nunca.json`.
 
 ### Scripts
 
 ```bash
-npm start      # Dev server (http://localhost:4200)
+npm start      # Dev server → http://localhost:4200
 npm run build  # Production build
 npm test       # Unit tests
+```
+
+More detail: [frontend/README.md](frontend/README.md)
+
+### Project structure
+
+```text
+Between-u-and-me/
+├── docs/
+│   └── screenshots/
+│         ├── home.png
+│         ├── nhie-fiesta.png
+│         └── nhie-redes.png
+├── frontend/
+│   ├── public/
+│   │   ├── _redirects
+│   │   └── data/
+│   │         ├── yo-nunca.json
+│   │         └── nhie.json
+│   └── src/app/
+│         ├── core/i18n/
+│         ├── pages/
+│         │   ├── home/
+│         │   └── neverHaveIEver/
+│         └── shared/
+│               ├── footer/
+│               └── language-bubble/
+├── LICENSE
+├── README.md
+└── .gitignore
 ```
 
 ### Deploy on Netlify
@@ -114,70 +123,57 @@ npm test       # Unit tests
 | Build command | `npm run build` |
 | Publish directory | `dist/between-u-and-me/browser` |
 
-For Angular client routes such as `/nhie`, configure an SPA fallback so refreshes do not 404 (`/*` → `/index.html` with status `200`). The repo already ships `frontend/public/_redirects` for Netlify.
+SPA fallback for routes like `/nhie`: `/*` → `/index.html` (`200`). The repo ships `frontend/public/_redirects` for Netlify.
+
+### License
+
+MIT License. See [LICENSE](LICENSE).
 
 ---
 
+<a id="espanol"></a>
+
 ## Español
 
-### Qué es
+**Aplicación web pública** | **Juegos para tu grupo de amigos** | **Sin login · Sin base de datos**
 
-Una web pequeña para guardar y jugar juegos con tu grupo de amigos. El primero es **Yo Nunca**, con:
+Between U & Me es un almacén pequeño de juegos para tu grupo. El primero es **Yo Nunca** / **Never Have I Ever**.
+
+> Lee en voz alta. Cada uno responde. Sigue hasta agotar el mazo.
+
+La interfaz se puede cambiar entre **español** e **inglés**. El banco de frases sigue el idioma elegido.
+
+### Capturas
+
+![Portada](docs/screenshots/home.png)
+
+![Yo Nunca — categoría fiesta](docs/screenshots/nhie-fiesta.png)
+
+![Yo Nunca — categoría redes](docs/screenshots/nhie-redes.png)
+
+### Qué incluye
 
 - Frases aleatorias desde un banco JSON
 - Filtro por una o varias categorías (o todas)
-- Sin repeticiones hasta agotar las frases del filtro; después se baraja de nuevo
-- Interfaz y frases en español e inglés
-- Aspecto por categoría: tinte de fondo, iconos flotantes, color de la carta, pass de overprint y botón sticker
+- Sin repeticiones hasta agotar el mazo filtrado; después se baraja de nuevo
+- Burbuja de idioma (abajo a la izquierda) para **ES ↔ EN**
+- Aspecto por categoría: tinte de fondo, iconos flotantes, color de la carta, pass de overprint y CTA sticker
 
 ### Diseño
 
-**Overprint + Sticker** — aire de imprenta, tipografía ancha (Anybody), teal×naranja en multiply (moss donde se cruzan), CTA die-cut que sobresale de la carta. En Yo Nunca, cada categoría cambia la paleta y los iconos del fondo.
-
-![Home — Between U & Me](docs/screenshots/home.png)
-
-![Yo Nunca — Fiesta](docs/screenshots/nhie-fiesta.png)
-
-![Yo Nunca — Redes](docs/screenshots/nhie-redes.png)
+**Overprint + Sticker** — aire de imprenta, tipografía ancha (Anybody), acento×segundo pass en multiply (moss donde se cruzan), CTA die-cut que sobresale de la carta. En Yo Nunca, cada categoría cambia la paleta y los iconos del fondo.
 
 ### Tecnologías
 
-| Área | Elección |
-|------|----------|
-| Framework | Angular 22 (componentes standalone) |
-| Lenguaje | TypeScript |
-| Estilos | CSS con tokens de diseño compartidos |
-| Tests | Vitest |
-| Datos | Bancos JSON estáticos |
-| Hosting | Build estático (listo para Netlify) |
+- **Angular 22** — componentes standalone
+- **TypeScript 5** — lenguaje de la app
+- **Tokens CSS** — sistema de diseño compartido (Overprint + Sticker)
+- **Vitest** — tests unitarios (lógica del mazo)
+- **JSON estático** — bancos de frases en `frontend/public/data/`
+- **Node.js 20+** — instalar, servir y construir
+- **Netlify** — hosting estático + redirects SPA
 
-### Requisitos
-
-- **Node.js** 20 o superior
-- **npm** 10 o superior
-
-### Estructura del proyecto
-
-```text
-Between-u-and-me/
-├── docs/screenshots/              # Capturas del README
-├── frontend/                      # App Angular
-│   ├── public/data/
-│   │   ├── yo-nunca.json          # Frases en español
-│   │   └── nhie.json              # Frases en inglés
-│   └── src/app/
-│       ├── core/i18n/             # Idioma + textos de UI
-│       ├── pages/
-│       │   ├── home/              # Portada
-│       │   └── neverHaveIEver/    # Juego, mazo, atmósfera por categoría
-│       └── shared/
-│           ├── footer/
-│           └── language-bubble/   # Selector ES/EN
-├── LICENSE
-└── README.md
-```
-
-### Cómo ejecutarlo en local
+### Ejecutar en local
 
 ```bash
 cd frontend
@@ -185,27 +181,57 @@ npm install
 npm start
 ```
 
-Abre [http://localhost:4200](http://localhost:4200).
+Interfaz: [http://localhost:4200](http://localhost:4200)
 
 ### Cómo se juega
 
-1. Entra en la home — **Between U & Me**
+1. Entra en la home
 2. Pulsa **Yo Nunca**
 3. Elige una o varias categorías, o **Todas**
 4. Lee la frase y pulsa **Otra frase**
-5. Usa la burbuja de idioma (abajo a la derecha) para cambiar **ES ↔ EN**
+5. Usa la burbuja de idioma (abajo a la izquierda) para **ES ↔ EN**
 
-Con inglés seleccionado se cargan las frases de `nhie.json`. Con español, las de `yo-nunca.json`.
+Con inglés se carga `nhie.json`. Con español, `yo-nunca.json`.
 
 ### Scripts
 
 ```bash
-npm start      # Servidor de desarrollo
+npm start      # Servidor de desarrollo → http://localhost:4200
 npm run build  # Build de producción
 npm test       # Tests unitarios
 ```
 
-### Deploy en Netlify
+Más detalle: [frontend/README.md](frontend/README.md)
+
+### Estructura del proyecto
+
+```text
+Between-u-and-me/
+├── docs/
+│   └── screenshots/
+│         ├── home.png
+│         ├── nhie-fiesta.png
+│         └── nhie-redes.png
+├── frontend/
+│   ├── public/
+│   │   ├── _redirects
+│   │   └── data/
+│   │         ├── yo-nunca.json
+│   │         └── nhie.json
+│   └── src/app/
+│         ├── core/i18n/
+│         ├── pages/
+│         │   ├── home/
+│         │   └── neverHaveIEver/
+│         └── shared/
+│               ├── footer/
+│               └── language-bubble/
+├── LICENSE
+├── README.md
+└── .gitignore
+```
+
+### Desplegar en Netlify
 
 | Ajuste | Valor |
 |--------|--------|
@@ -213,10 +239,8 @@ npm test       # Tests unitarios
 | Build command | `npm run build` |
 | Publish directory | `dist/between-u-and-me/browser` |
 
-Para rutas de Angular como `/nhie`, configura un fallback SPA para que al refrescar no dé 404 (`/*` → `/index.html` con estado `200`). El repo incluye `frontend/public/_redirects` para Netlify.
+Fallback SPA para rutas como `/nhie`: `/*` → `/index.html` (`200`). El repo incluye `frontend/public/_redirects` para Netlify.
 
----
+### Licencia
 
-## License
-
-MIT — see [LICENSE](./LICENSE).
+Licencia MIT. Consulta [LICENSE](LICENSE).

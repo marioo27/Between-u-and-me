@@ -7,7 +7,8 @@
   justify-content: center;
   align-items: center;
   margin: 0;
-  padding: 0.75rem 1.25rem calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  /* Clear the fixed language bubble (bottom-left) + safe areas */
+  padding: 0.75rem max(1.25rem, 4.75rem) calc(0.75rem + env(safe-area-inset-bottom, 0px));
   border-top: var(--rule-hair) solid var(--color-rule);
   background: transparent;
   text-align: center;
