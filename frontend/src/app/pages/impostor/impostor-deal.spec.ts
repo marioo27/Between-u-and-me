@@ -6,7 +6,6 @@ import {
   dealRound,
   graphemeLength,
   maxImpostors,
-  pickHintWord,
   resolveImpostorCount,
 } from './impostor-deal';
 
@@ -71,27 +70,20 @@ describe('buildRevealOrder', () => {
   });
 });
 
-describe('pickHintWord', () => {
-  it('returns null when only the secret exists', () => {
-    expect(pickHintWord(['solo'], 'solo')).toBeNull();
-  });
-
-  it('never returns the secret', () => {
-    const hint = pickHintWord(['a', 'b', 'c'], 'a', () => 0);
-    expect(hint).toBe('b');
-  });
-});
-
 describe('dealRound', () => {
   const bank = {
-    animales: ['gato', 'perro', 'loro'],
-    comidas: ['pizza'],
+    animales: [
+      { word: 'Tiburón', hint: 'aleta' },
+      { word: 'Gato', hint: 'sofá' },
+      { word: 'Lobo', hint: 'luna' },
+    ],
+    comidas: [{ word: 'Pizza', hint: '' }],
   };
 
-  it('deals civilians the secret and impostors per hint mode', () => {
+  it('gives impostors the paired hint for the secret word', () => {
     let n = 0;
     const rng = () => {
-      const values = [0.1, 0.1, 0.5, 0.01, 0.2, 0.3, 0.4, 0.5, 0.6];
+      const values = [0.1, 0.0, 0.5, 0.01, 0.2, 0.3, 0.4, 0.5, 0.6];
       return values[n++] ?? 0.5;
     };
     const round = dealRound({
@@ -106,17 +98,17 @@ describe('dealRound', () => {
       rng,
     });
     expect(round.categoryId).toBe('animales');
-    expect(round.players).toHaveLength(3);
-    expect(round.impostorCount).toBe(1);
+    expect(round.secretWord).toBe('Tiburón');
+    expect(round.hintWord).toBe('aleta');
     const impostors = round.players.filter((p) => p.isImpostor);
     const civils = round.players.filter((p) => !p.isImpostor);
     expect(impostors).toHaveLength(1);
-    expect(civils.every((p) => p.revealWord === round.secretWord)).toBe(true);
+    expect(civils.every((p) => p.revealWord === 'Tiburón')).toBe(true);
     expect(impostors[0]!.revealWord).toBeNull();
-    expect(impostors[0]!.revealHintWord).not.toBe(round.secretWord);
+    expect(impostors[0]!.revealHintWord).toBe('aleta');
   });
 
-  it('falls back hint mode to category when only one word', () => {
+  it('falls back hint mode to category when hint is empty', () => {
     let n = 0;
     const rng = () => {
       const values = [0, 0, 0.5, 0.01, 0.2, 0.3, 0.4];
@@ -135,6 +127,7 @@ describe('dealRound', () => {
     });
     const impostor = round.players.find((p) => p.isImpostor)!;
     expect(impostor.revealHintMode).toBe('category');
+    expect(round.hintWord).toBeNull();
   });
 });
 

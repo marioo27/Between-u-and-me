@@ -77,24 +77,43 @@
 
         <section class="setup__block">
           <h2 class="setup__heading">{{ t().impostorCategories }}</h2>
-          <div class="setup__chips">
+          <div class="setup__dropdown">
             <button
               type="button"
-              class="chip"
-              [class.chip--active]="allCategoriesSelected()"
-              (click)="toggleAllCategories()"
+              class="setup__dropdown-toggle"
+              [attr.aria-expanded]="categoriesOpen()"
+              aria-controls="impostor-category-panel"
+              (click)="toggleCategoriesOpen()"
             >
-              {{ t().impostorAllCategories }}
+              <span class="setup__dropdown-summary">{{ categoriesSummary() }}</span>
+              <span class="setup__dropdown-chevron" aria-hidden="true"></span>
             </button>
-            @for (cat of categories(); track cat) {
-              <button
-                type="button"
-                class="chip"
-                [class.chip--active]="isCategorySelected(cat)"
-                (click)="toggleCategory(cat)"
+            @if (categoriesOpen()) {
+              <div
+                id="impostor-category-panel"
+                class="setup__dropdown-panel setup__chips"
+                role="group"
+                [attr.aria-label]="t().impostorCategories"
               >
-                {{ categoryLabel(cat) }}
-              </button>
+                <button
+                  type="button"
+                  class="chip"
+                  [class.chip--active]="allCategoriesSelected()"
+                  (click)="toggleAllCategories()"
+                >
+                  {{ t().impostorAllCategories }}
+                </button>
+                @for (cat of categories(); track cat) {
+                  <button
+                    type="button"
+                    class="chip"
+                    [class.chip--active]="isCategorySelected(cat)"
+                    (click)="toggleCategory(cat)"
+                  >
+                    {{ categoryLabel(cat) }}
+                  </button>
+                }
+              </div>
             }
           </div>
         </section>

@@ -70,6 +70,7 @@ export class Impostor {
   protected readonly players = signal<SetupPlayer[]>([]);
   protected readonly nameDraft = signal('');
   protected readonly selectedImpostors = signal(1);
+  protected readonly categoriesOpen = signal(false);
   protected readonly chaos = signal(false);
   protected readonly hintMode = signal<ImpostorHintMode>('hint');
   protected readonly orderMode = signal<RevealOrderMode>('list');
@@ -94,6 +95,20 @@ export class Impostor {
     const all = this.categories();
     const selected = this.selectedCategories();
     return all.length > 0 && selected.length === all.length;
+  });
+
+  protected readonly categoriesSummary = computed(() => {
+    const selected = this.selectedCategories();
+    if (selected.length === 0) {
+      return this.t().nhieCategoriesSummaryNone;
+    }
+    if (this.allCategoriesSelected()) {
+      return this.t().nhieCategoriesSummaryAll;
+    }
+    return this.t().nhieCategoriesSummaryCount.replace(
+      '{count}',
+      String(selected.length),
+    );
   });
 
   protected readonly currentPlayer = computed((): DealtPlayer | null => {
@@ -212,6 +227,10 @@ export class Impostor {
 
   protected endReorder(): void {
     this.dragFrom.set(null);
+  }
+
+  protected toggleCategoriesOpen(): void {
+    this.categoriesOpen.update((open) => !open);
   }
 
   protected toggleAllCategories(): void {

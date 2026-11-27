@@ -1,7 +1,13 @@
 export type ImpostorHintMode = 'none' | 'hint' | 'category';
 export type RevealOrderMode = 'list' | 'random';
 
-export type ImpostorWordBank = Record<string, string[]>;
+/** Secret word + a related hint for impostor mode “hint”. */
+export interface ImpostorWordEntry {
+  word: string;
+  hint: string;
+}
+
+export type ImpostorWordBank = Record<string, ImpostorWordEntry[]>;
 
 export const IMPOSTOR_CATEGORY_ORDER = [
   'animales',
@@ -118,18 +124,6 @@ export function buildRevealOrder(
   return mode === 'random' ? shuffle(indices, rng) : indices;
 }
 
-export function pickHintWord(
-  words: readonly string[],
-  secret: string,
-  rng: () => number = Math.random,
-): string | null {
-  const others = words.filter((w) => w !== secret);
-  if (others.length === 0) {
-    return null;
-  }
-  return others[Math.floor(rng() * others.length)] ?? null;
-}
-
 export function dealRound(options: {
   names: readonly string[];
   selectedCategories: readonly string[];
@@ -157,11 +151,13 @@ export function dealRound(options: {
   }
 
   const categoryId = categories[Math.floor(rng() * categories.length)]!;
-  const words = options.bank[categoryId]!;
-  const secretWord = words[Math.floor(rng() * words.length)]!;
+  const entries = options.bank[categoryId]!;
+  const entry = entries[Math.floor(rng() * entries.length)]!;
+  const secretWord = entry.word;
+  const pairedHint = entry.hint.trim();
 
   let hintMode = options.hintMode;
-  let hintWord = pickHintWord(words, secretWord, rng);
+  let hintWord: string | null = pairedHint.length > 0 ? pairedHint : null;
   if (hintMode === 'hint' && hintWord === null) {
     hintMode = 'category';
   }

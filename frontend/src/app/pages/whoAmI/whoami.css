@@ -1,0 +1,183 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.whoami__bar {
+  height: 3.5rem;
+  border-bottom: var(--rule-bar) solid var(--color-ink);
+}
+
+.whoami__bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  height: 100%;
+}
+
+.whoami__back {
+  max-width: 36%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+}
+
+.whoami__title {
+  margin: 0;
+  font-size: var(--text-md);
+}
+
+.whoami__panel {
+  padding-block: var(--space-xl);
+  display: grid;
+  gap: var(--space-md);
+}
+
+.whoami__heading {
+  margin: 0;
+  font: 700 var(--text-sm) / 1.2 var(--font-outlier);
+  text-transform: uppercase;
+}
+
+.whoami__add {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.whoami__input {
+  flex: 1;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-ink);
+  background: color-mix(in oklab, var(--color-paper) 80%, white);
+  font: 600 var(--text-md) / 1.2 var(--font-body);
+}
+
+.whoami__list,
+.whoami__seen {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.whoami__list li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  border-bottom: 1px solid var(--color-rule);
+  padding: 0.35rem 0;
+}
+
+.whoami__note,
+.whoami__hint,
+.whoami__error {
+  margin: 0;
+  color: var(--color-muted);
+  font: 600 var(--text-sm) / 1.35 var(--font-body);
+}
+
+.whoami__error {
+  color: #b42318;
+}
+
+.whoami__big {
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1.8rem, 7vw, 2.8rem);
+}
+
+.linkish {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-decoration: underline;
+  cursor: pointer;
+  justify-self: start;
+}
+
+.flip-card {
+  position: relative;
+  width: min(100%, 26rem);
+  height: 16rem;
+  margin: 0 auto;
+  border: 9px solid var(--color-ink);
+  background: color-mix(in oklab, var(--color-paper) 85%, white);
+  perspective: 900px;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  box-shadow: 8px 8px 0 var(--color-ink);
+}
+
+.flip-card__face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  padding: var(--space-md);
+  backface-visibility: hidden;
+  transition: transform 0.35s var(--ease-out);
+}
+
+.flip-card__face--back {
+  transform: rotateY(0);
+  font: 700 1.5rem / 1.2 var(--font-outlier);
+}
+
+.flip-card__face--front {
+  transform: rotateY(180deg);
+  overflow: auto;
+}
+
+.flip-card--open .flip-card__face--back {
+  transform: rotateY(180deg);
+}
+
+.flip-card--open .flip-card__face--front {
+  transform: rotateY(0);
+}
+
+.whoami__seen li {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  font: 600 var(--text-sm) / 1.3 var(--font-body);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  padding: var(--space-md);
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: color-mix(in oklab, #111 35%, transparent);
+  cursor: pointer;
+}
+
+.modal__card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 24rem);
+  padding: var(--space-lg);
+  border: 2px solid var(--color-ink);
+  background: var(--color-paper);
+  box-shadow: 5px 5px 0 var(--color-ink);
+}
+
+.modal__body {
+  white-space: pre-wrap;
+  font: 500 var(--text-sm) / 1.45 var(--font-body);
+}

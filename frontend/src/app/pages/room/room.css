@@ -1,0 +1,232 @@
+:host {
+  display: block;
+  min-height: 100dvh;
+  background: var(--color-paper);
+  color: var(--color-ink);
+}
+
+.room__bar {
+  height: 3.5rem;
+  border-bottom: var(--rule-bar) solid var(--color-ink);
+}
+
+.room__bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  height: 100%;
+}
+
+.room__back {
+  max-width: 36%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+}
+
+.room__title {
+  margin: 0;
+  font-size: var(--text-md);
+  letter-spacing: 0.08em;
+}
+
+.room__panel {
+  padding-block: var(--space-xl);
+  display: grid;
+  gap: var(--space-md);
+}
+
+.room__heading {
+  margin: var(--space-md) 0 0;
+  font: 700 var(--text-sm) / 1.2 var(--font-outlier);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.room__actions,
+.room__join,
+.room__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+}
+
+.room__input {
+  flex: 1 1 10rem;
+  min-width: 0;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-ink);
+  background: color-mix(in oklab, var(--color-paper) 80%, white);
+  font: 600 var(--text-md) / 1.2 var(--font-body);
+}
+
+.room__status,
+.room__hint,
+.room__meta,
+.room__progress {
+  margin: 0;
+  color: var(--color-muted);
+  font: 600 var(--text-sm) / 1.35 var(--font-body);
+}
+
+.room__error {
+  margin: 0;
+  color: #b42318;
+  font: 600 var(--text-sm) / 1.3 var(--font-body);
+}
+
+.room__phrase {
+  margin: 0;
+  font-size: clamp(1.5rem, 6vw, 2.4rem);
+  text-align: center;
+}
+
+.room__seats,
+.room__whoami {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.room__seats li,
+.room__whoami li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  padding: 0.4rem 0;
+  border-bottom: 1px solid var(--color-rule);
+}
+
+.room__whoami {
+  gap: var(--space-md);
+}
+
+.room__whoami-name {
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  color: var(--color-muted);
+  text-transform: uppercase;
+}
+
+.room__whoami-char {
+  font-size: clamp(1.4rem, 5vw, 2rem);
+}
+
+.chip {
+  padding: 0.4rem 0.7rem;
+  border: 2px solid var(--color-ink);
+  background: transparent;
+  font: 600 var(--text-sm) / 1 var(--font-outlier);
+  cursor: pointer;
+}
+
+.chip--active {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+}
+
+.chip:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.linkish {
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.flip-card {
+  position: relative;
+  width: min(100%, 26rem);
+  height: 16rem;
+  margin: var(--space-md) auto;
+  padding: 0;
+  border: 9px solid var(--color-ink);
+  background: color-mix(in oklab, var(--color-paper) 85%, white);
+  perspective: 900px;
+  cursor: pointer;
+  user-select: none;
+  touch-action: none;
+  box-shadow: 8px 8px 0 var(--color-ink);
+}
+
+.flip-card__face {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 0.5rem;
+  padding: var(--space-md);
+  backface-visibility: hidden;
+  transition: transform 0.35s var(--ease-out);
+}
+
+.flip-card__face--back {
+  transform: rotateY(0deg);
+  font: 700 clamp(1.35rem, 4.5vw, 1.85rem) / 1.2 var(--font-outlier);
+}
+
+.flip-card__face--front {
+  transform: rotateY(180deg);
+}
+
+.flip-card--open .flip-card__face--back {
+  transform: rotateY(180deg);
+}
+
+.flip-card--open .flip-card__face--front {
+  transform: rotateY(0deg);
+}
+
+.flip-card__role--impostor {
+  color: #b42318;
+  font: 900 clamp(2rem, 8vw, 3rem) / 1 var(--font-display);
+  text-transform: uppercase;
+}
+
+.flip-card__word {
+  font: 800 clamp(1.5rem, 6vw, 2.3rem) / 1.15 var(--font-display);
+}
+
+.flip-card__meta {
+  font: 700 clamp(1rem, 3.6vw, 1.25rem) / 1.3 var(--font-body);
+}
+
+.play__starts {
+  margin: 0;
+  font: 900 clamp(2.4rem, 12vw, 4rem) / 1 var(--font-display);
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.play__starts-name {
+  margin: 0;
+  font-size: clamp(1.8rem, 8vw, 3rem);
+  text-align: center;
+}
+
+.play__impostors-title,
+.play__impostors-name {
+  margin: 0;
+  color: #b42318;
+  font: 900 clamp(2rem, 9vw, 3.5rem) / 1.05 var(--font-display);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.play__impostors-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: var(--space-sm);
+}

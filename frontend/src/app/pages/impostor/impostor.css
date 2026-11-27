@@ -199,6 +199,59 @@
   font-size: var(--text-sm);
 }
 
+.setup__dropdown {
+  display: grid;
+  gap: var(--space-sm);
+}
+
+.setup__dropdown-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  width: 100%;
+  padding: var(--space-sm) var(--space-md);
+  border: 2px solid var(--color-ink);
+  background: color-mix(in oklab, var(--color-paper) 82%, white);
+  color: var(--color-ink);
+  font: 600 var(--text-md) / 1.3 var(--font-body);
+  text-align: left;
+  cursor: pointer;
+}
+
+.setup__dropdown-toggle:hover {
+  background: color-mix(in oklab, var(--color-paper) 70%, white);
+}
+
+.setup__dropdown-summary {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.setup__dropdown-chevron {
+  flex-shrink: 0;
+  width: 0.55rem;
+  height: 0.55rem;
+  margin-top: -0.2rem;
+  border-right: 2px solid var(--color-ink);
+  border-bottom: 2px solid var(--color-ink);
+  transform: rotate(45deg);
+  transition: transform 0.15s var(--ease-out);
+}
+
+.setup__dropdown-toggle[aria-expanded='true'] .setup__dropdown-chevron {
+  margin-top: 0.15rem;
+  transform: rotate(225deg);
+}
+
+.setup__dropdown-panel {
+  padding: var(--space-sm);
+  border: 2px solid var(--color-ink);
+  background: color-mix(in oklab, var(--color-paper) 88%, white);
+}
+
 .setup__chips {
   display: flex;
   flex-wrap: wrap;

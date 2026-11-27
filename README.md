@@ -20,14 +20,15 @@
 
 ## English
 
-**Public web app** | **Party games for friends** | **No login · No database**
+**Public web app** | **Party games for friends** | **No login · Rooms via Render**
 
 Between U & Me is a small vault of games for your friend group. Games today:
 
-- **Never Have I Ever** / **Yo Nunca** — random prompts, category filters, no repeats until the deck is spent.
-- **The Impostor** — pass-the-phone roles: civilians see a secret word; impostors see a hint, the category, or nothing.
+- **Never Have I Ever** / **Yo Nunca** — random prompts; local or multi-phone room (same phrase synced).
+- **The Impostor** — pass-the-phone or room mode with seat claims per device.
+- **Who Am I** / **Quién soy** — characters to guess with yes/no questions; local or room.
 
-Language (ES ↔ EN) lives in the **settings menu (☰)** in the header — not a floating bubble.
+Language (ES ↔ EN) lives in the **settings menu (☰)** in the header.
 
 ### Screenshots
 
@@ -57,19 +58,37 @@ Language (ES ↔ EN) lives in the **settings menu (☰)** in the header — not 
 ### Run locally
 
 ```bash
+# API (rooms) — terminal 1
+cd backend
+npm install
+npm run dev
+# → http://localhost:3000  health: /api/health
+
+# UI — terminal 2
 cd frontend
 npm install
 npm start
+# → http://localhost:4200
 ```
 
-UI: [http://localhost:4200](http://localhost:4200)
+Set `frontend/src/environments/environment.ts` `apiUrl` if the API is not on `:3000`.
 
 ### Scripts
+
+**Frontend** (`frontend/`):
 
 ```bash
 npm start      # Dev server → http://localhost:4200
 npm run build  # Production build
 npm test       # Unit tests
+```
+
+**Backend** (`backend/`):
+
+```bash
+npm run dev    # tsx watch
+npm run build  # tsc + copy data
+npm start      # node dist/index.js
 ```
 
 More detail: [frontend/README.md](frontend/README.md)
@@ -78,31 +97,22 @@ More detail: [frontend/README.md](frontend/README.md)
 
 ```text
 Between-u-and-me/
-├── docs/
-│   └── screenshots/
+├── backend/                 # Express + Socket.IO (rooms)
+│   ├── Dockerfile
+│   ├── data/                # word / character banks for the API
+│   └── src/
+├── docs/screenshots/
 ├── frontend/
-│   ├── public/
-│   │   ├── _redirects
-│   │   └── data/
-│   │         ├── yo-nunca.json
-│   │         ├── nhie.json
-│   │         ├── impostor-es.json
-│   │         └── impostor-en.json
+│   ├── public/data/         # client JSON banks
 │   └── src/app/
-│         ├── core/i18n/
-│         ├── pages/
-│         │   ├── home/
-│         │   ├── neverHaveIEver/
-│         │   └── impostor/
-│         └── shared/
-│               ├── footer/
-│               └── site-menu/
+│         ├── core/i18n/ room/
+│         ├── pages/ home/ neverHaveIEver/ impostor/ whoAmI/ room/
+│         └── shared/site-menu/
 ├── LICENSE
-├── README.md
-└── .gitignore
+└── README.md
 ```
 
-### Deploy on Netlify
+### Deploy on Netlify (UI)
 
 | Setting | Value |
 |---------|--------|
@@ -111,6 +121,25 @@ Between-u-and-me/
 | Publish directory | `dist/between-u-and-me/browser` |
 
 SPA fallback: `/*` → `/index.html` (`200`). Ships `frontend/public/_redirects`.
+
+Point production `environment.prod.ts` `apiUrl` at your Render URL.
+
+### Deploy on Render (API / rooms)
+
+| Setting | Value |
+|---------|--------|
+| Language | Docker |
+| Root Directory | `backend` |
+| Dockerfile Path | `Dockerfile` |
+| Branch | `main` |
+| Health check | `/api/health` |
+
+Environment variables:
+
+- `CORS_ORIGIN` = `https://between-u-and-me.netlify.app` (comma-separate extra origins if needed)
+- `PORT` — set by Render
+
+Free instances sleep when idle; the lobby shows a “waking server” hint.
 
 ### License
 
@@ -141,78 +170,30 @@ El idioma (ES ↔ EN) se cambia en el **menú de ajustes (☰)** del header.
 
 ### Qué incluye
 
-- Catálogo en home con dos juegos separados
-- Menú ☰: idioma, atajos, ayuda, acerca de
-- Yo Nunca: bancos JSON, filtros, atmósfera por categoría
-- Impostor: nombres, tabla de impostores, caos, modo discreto, carta hold-to-flip
-- Listo para hosting estático (Netlify)
+- Catálogo: Yo Nunca, Impostor, Quién soy + salas multi-móvil
+- Menú ☰: idioma, juegos, salas, créditos
+- Salas con API Socket.IO (Render): NHIE sincroniza frase; Impostor/Quién soy con claim por móvil
+- Modo local pass-the-phone sigue disponible
 
 ### Tecnologías
 
-- **Angular 22** — componentes standalone
-- **TypeScript 5**
-- **Tokens CSS** — Overprint + Sticker
-- **Vitest** — tests unitarios
-- **JSON estático** — `frontend/public/data/`
-- **Netlify** — hosting + redirects SPA
+- **Angular 22** + **Express / Socket.IO**
+- **JSON** de contenido + salas en memoria en el API
+- **Netlify** (UI) + **Render** (API Docker)
 
 ### Ejecutar en local
 
 ```bash
-cd frontend
-npm install
-npm start
+cd backend && npm install && npm run dev
+cd frontend && npm install && npm start
 ```
 
-Interfaz: [http://localhost:4200](http://localhost:4200)
+UI: [http://localhost:4200](http://localhost:4200) · API: [http://localhost:3000/api/health](http://localhost:3000/api/health)
 
-### Scripts
+### Desplegar
 
-```bash
-npm start      # Servidor de desarrollo → http://localhost:4200
-npm run build  # Build de producción
-npm test       # Tests unitarios
-```
-
-Más detalle: [frontend/README.md](frontend/README.md)
-
-### Estructura del proyecto
-
-```text
-Between-u-and-me/
-├── docs/
-│   └── screenshots/
-├── frontend/
-│   ├── public/
-│   │   ├── _redirects
-│   │   └── data/
-│   │         ├── yo-nunca.json
-│   │         ├── nhie.json
-│   │         ├── impostor-es.json
-│   │         └── impostor-en.json
-│   └── src/app/
-│         ├── core/i18n/
-│         ├── pages/
-│         │   ├── home/
-│         │   ├── neverHaveIEver/
-│         │   └── impostor/
-│         └── shared/
-│               ├── footer/
-│               └── site-menu/
-├── LICENSE
-├── README.md
-└── .gitignore
-```
-
-### Desplegar en Netlify
-
-| Ajuste | Valor |
-|--------|--------|
-| Base directory | `frontend` |
-| Build command | `npm run build` |
-| Publish directory | `dist/between-u-and-me/browser` |
-
-Fallback SPA: `/*` → `/index.html` (`200`). Incluye `frontend/public/_redirects`.
+- **Netlify:** base `frontend`, build `npm run build`, publish `dist/between-u-and-me/browser`; `apiUrl` de producción → URL Render.
+- **Render:** Docker, Root `backend`, Dockerfile `Dockerfile`, health `/api/health`, env `CORS_ORIGIN`.
 
 ### Licencia
 

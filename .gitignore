@@ -3,6 +3,8 @@ node_modules/
 frontend/node_modules/
 frontend/dist/
 frontend/.angular/
+backend/node_modules/
+backend/dist/
 
 # Logs & OS
 *.log

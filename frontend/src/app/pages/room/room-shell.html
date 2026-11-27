@@ -1,0 +1,213 @@
+<main class="room">
+  <header class="room__bar">
+    <div class="container room__bar-inner">
+      <button type="button" class="room__back linkish" (click)="leave()">{{ t().roomLeave }}</button>
+      <h1 class="display room__title">{{ state()?.code }}</h1>
+      <app-site-menu />
+    </div>
+  </header>
+
+  <section class="container room__panel">
+    @if (error()) {
+      <p class="room__error" role="alert">{{ error() }}</p>
+    }
+
+    @if (state(); as st) {
+      <p class="room__meta">
+        {{ t().roomConnected.replace('{count}', '' + st.connectedCount) }}
+        @if (st.youAreHost) {
+          · {{ t().roomYouHost }}
+        }
+      </p>
+
+      <!-- LOBBY NHIE -->
+      @if (st.game === 'nhie' && st.phase === 'lobby') {
+        <p class="room__hint">{{ t().roomNhieLobbyHint }}</p>
+        @if (st.youAreHost) {
+          <button type="button" class="die" (click)="startNhie()">{{ t().roomStart }}</button>
+        } @else {
+          <p class="room__status">{{ t().roomWaitingHost }}</p>
+        }
+      }
+
+      <!-- LOBBY seats (impostor / whoami) -->
+      @if ((st.game === 'impostor' || st.game === 'whoami') && st.phase === 'lobby') {
+        <h2 class="room__heading">{{ t().roomPlayers }}</h2>
+        @if (st.youAreHost) {
+          <div class="room__join">
+            <input
+              class="room__input"
+              type="text"
+              maxlength="20"
+              [value]="nameDraft()"
+              [attr.placeholder]="t().impostorNamePlaceholder"
+              (input)="nameDraft.set($any($event.target).value)"
+              (keydown.enter)="$event.preventDefault(); addSeat()"
+            />
+            <button type="button" class="die" (click)="addSeat()">{{ t().impostorAdd }}</button>
+          </div>
+        }
+        <ul class="room__seats">
+          @for (seat of st.seats; track seat.id) {
+            <li>
+              <span>{{ seat.name }}</span>
+              @if (st.youAreHost) {
+                <button type="button" class="linkish" (click)="removeSeat(seat.id)">
+                  {{ t().impostorRemove }}
+                </button>
+              }
+            </li>
+          }
+        </ul>
+        @if (st.youAreHost) {
+          @if (st.game === 'impostor') {
+            <button
+              type="button"
+              class="die"
+              [disabled]="st.seats.length < 3"
+              (click)="startImpostor()"
+            >
+              {{ t().roomStart }}
+            </button>
+          }
+          @if (st.game === 'whoami') {
+            <button
+              type="button"
+              class="die"
+              [disabled]="st.seats.length < 2"
+              (click)="startWhoami()"
+            >
+              {{ t().roomStart }}
+            </button>
+          }
+        } @else {
+          <p class="room__status">{{ t().roomWaitingHost }}</p>
+        }
+      }
+
+      <!-- CLAIM -->
+      @if (st.phase === 'claim') {
+        <h2 class="room__heading">{{ t().roomClaimTitle }}</h2>
+        <p class="room__hint">{{ t().roomClaimHint }}</p>
+        <div class="room__chips">
+          @for (seat of st.seats; track seat.id) {
+            <button
+              type="button"
+              class="chip"
+              [class.chip--active]="isClaimedByYou(seat.id)"
+              [disabled]="isClaimedByOther(seat.id)"
+              (click)="toggleClaim(seat.id)"
+            >
+              {{ seat.name }}
+            </button>
+          }
+        </div>
+        <button type="button" class="die" (click)="saveClaim()">{{ t().roomClaimSave }}</button>
+        @if (st.youAreHost) {
+          <button type="button" class="die" (click)="finishClaim()">{{ t().roomContinue }}</button>
+        }
+      }
+
+      <!-- NHIE PLAY -->
+      @if (st.game === 'nhie' && st.phase === 'playing' && st.nhie) {
+        <p class="room__progress">
+          {{ t().nhieProgress.replace('{current}', '' + st.nhie.index).replace('{total}', '' + st.nhie.total) }}
+        </p>
+        <p class="display room__phrase">{{ st.nhie.phrase }}</p>
+        @if (st.youAreHost) {
+          <button type="button" class="die" (click)="nhieNext()">{{ t().nhieNext }}</button>
+        }
+      }
+
+      <!-- IMPOSTOR reveal/play -->
+      @if (st.game === 'impostor' && (st.phase === 'playing' || st.phase === 'claim') && st.impostor; as imp) {
+        @if (imp.phase === 'reveal' && st.phase === 'playing') {
+          @if (currentRevealSeatId(); as rid) {
+            <p class="room__hint">{{ t().impostorPassTo }}</p>
+            <p class="display room__phrase">{{ seatName()(rid) }}</p>
+            @if (isYourRevealTurn()) {
+              <p class="room__hint">{{ t().impostorHold }}</p>
+              <button
+                type="button"
+                class="flip-card"
+                [class.flip-card--open]="holding()"
+                (pointerdown)="holdStart($event)"
+                (pointerup)="holdEnd()"
+                (pointerleave)="holdEnd()"
+                (pointercancel)="holdEnd()"
+              >
+                <span class="flip-card__face flip-card__face--back">{{ seatName()(rid) }}</span>
+                <span class="flip-card__face flip-card__face--front">
+                  @if (secretFor(rid); as sec) {
+                    @if (sec.isImpostor) {
+                      <span class="flip-card__role flip-card__role--impostor">{{ t().impostorRoleImpostor }}</span>
+                      @if (sec.revealHintMode === 'hint' && sec.revealHintWord) {
+                        <span class="flip-card__meta">{{ t().impostorHintLabel }}: {{ sec.revealHintWord }}</span>
+                      }
+                      @if (sec.revealHintMode === 'category') {
+                        <span class="flip-card__meta">{{ t().impostorCategoryLabel }}: {{ sec.revealCategory }}</span>
+                      }
+                    } @else {
+                      <span class="flip-card__word">{{ sec.revealWord }}</span>
+                    }
+                  }
+                </span>
+              </button>
+            } @else {
+              <p class="room__status">{{ t().roomWaitReveal }}</p>
+            }
+            @if (st.youAreHost) {
+              @if (imp.revealIndex >= imp.revealOrder.length - 1) {
+                <button type="button" class="die" [disabled]="!hasRevealed() && isYourRevealTurn()" (click)="goPlay()">
+                  {{ t().impostorStartGame }}
+                </button>
+              } @else {
+                <button type="button" class="die" (click)="nextReveal()">{{ t().impostorNext }}</button>
+              }
+            }
+          }
+        }
+
+        @if (imp.phase === 'play') {
+          <p class="play__starts">{{ t().impostorStarter }}</p>
+          <p class="display play__starts-name">
+            {{ seatName()(imp.starterSeatId ?? '') }}
+          </p>
+          @if (st.youAreHost) {
+            <button type="button" class="die" (click)="revealImpostors()">{{ t().impostorReveal }}</button>
+          }
+        }
+      }
+
+      @if (st.game === 'impostor' && st.phase === 'revealed') {
+        <p class="play__impostors-title">{{ t().impostorRevealed }}</p>
+        @if (impostorNames().length === 0) {
+          <p class="play__impostors-name">{{ t().impostorNone }}</p>
+        } @else {
+          <ul class="play__impostors-list">
+            @for (n of impostorNames(); track n) {
+              <li class="play__impostors-name">{{ n }}</li>
+            }
+          </ul>
+        }
+      }
+
+      <!-- WHOAMI -->
+      @if (st.game === 'whoami' && st.phase === 'playing' && st.whoami) {
+        <h2 class="room__heading">{{ t().whoamiAnswerTo }}</h2>
+        <p class="room__hint">{{ t().whoamiPlayHint }}</p>
+        <ul class="room__whoami">
+          @for (row of visibleWhoami(); track row.id) {
+            <li>
+              <span class="room__whoami-name">{{ row.name }}</span>
+              <span class="display room__whoami-char">{{ row.character }}</span>
+            </li>
+          }
+        </ul>
+        @if (visibleWhoami().length === 0) {
+          <p class="room__status">{{ t().whoamiClaimFirst }}</p>
+        }
+      }
+    }
+  </section>
+</main>

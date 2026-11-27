@@ -1,0 +1,96 @@
+<main class="whoami">
+  <header class="whoami__bar">
+    <div class="container whoami__bar-inner">
+      <a class="whoami__back" routerLink="/">{{ t().whoamiBack }}</a>
+      <h1 class="display whoami__title">{{ t().whoamiTitle }}</h1>
+      <app-site-menu />
+    </div>
+  </header>
+
+  <section class="container whoami__panel">
+    @if (loadState() === 'loading') {
+      <p role="status">{{ t().impostorLoading }}</p>
+    }
+    @if (loadState() === 'error') {
+      <p class="whoami__error" role="alert">{{ t().impostorError }}</p>
+    }
+
+    @if (phase() === 'setup' && loadState() === 'ready') {
+      <button type="button" class="linkish" (click)="openHowTo()">{{ t().whoamiHowToPlay }}</button>
+      <h2 class="whoami__heading">{{ t().roomPlayers }}</h2>
+      <div class="whoami__add">
+        <input
+          class="whoami__input"
+          type="text"
+          maxlength="20"
+          [value]="nameDraft()"
+          [attr.placeholder]="t().impostorNamePlaceholder"
+          (input)="nameDraft.set($any($event.target).value)"
+          (keydown.enter)="$event.preventDefault(); addName()"
+        />
+        <button type="button" class="die" (click)="addName()">{{ t().impostorAdd }}</button>
+      </div>
+      <ul class="whoami__list">
+        @for (p of players(); track p.id) {
+          <li>
+            <span>{{ p.name }}</span>
+            <button type="button" class="linkish" (click)="removeName($index)">
+              {{ t().impostorRemove }}
+            </button>
+          </li>
+        }
+      </ul>
+      @if (players().length < 2) {
+        <p class="whoami__note">{{ t().whoamiNeedPlayers }}</p>
+      }
+      <button type="button" class="die" [disabled]="!canStart()" (click)="start()">
+        {{ t().whoamiStart }}
+      </button>
+    }
+
+    @if (phase() === 'memorize' && currentMemorize(); as mem) {
+      <p class="whoami__hint">{{ t().impostorPassTo }}</p>
+      <p class="display whoami__big">{{ mem.viewer }}</p>
+      <p class="whoami__hint">{{ t().whoamiHold }}</p>
+      <button
+        type="button"
+        class="flip-card"
+        [class.flip-card--open]="holding()"
+        (pointerdown)="holdStart($event)"
+        (pointerup)="holdEnd()"
+        (pointerleave)="holdEnd()"
+        (pointercancel)="holdEnd()"
+      >
+        <span class="flip-card__face flip-card__face--back">{{ mem.viewer }}</span>
+        <span class="flip-card__face flip-card__face--front">
+          <ul class="whoami__seen">
+            @for (o of mem.others; track o.name) {
+              <li>
+                <span>{{ o.name }}</span>
+                <strong>{{ o.character }}</strong>
+              </li>
+            }
+          </ul>
+        </span>
+      </button>
+      <button type="button" class="die" (click)="nextMemorize()">{{ t().whoamiNext }}</button>
+    }
+
+    @if (phase() === 'play') {
+      <h2 class="whoami__heading">{{ t().whoamiAnswerTo }}</h2>
+      <p class="whoami__hint">{{ t().whoamiPlayHint }}</p>
+      <button type="button" class="die" (click)="backSetup()">{{ t().impostorNewRound }}</button>
+    }
+  </section>
+
+  @if (showHowTo()) {
+    <div class="modal" role="dialog" [attr.aria-label]="t().whoamiHowToTitle">
+      <div class="modal__card">
+        <h2 class="display">{{ t().whoamiHowToTitle }}</h2>
+        <pre class="modal__body">{{ t().whoamiHowToBody }}</pre>
+        <button type="button" class="die" (click)="closeHowTo()">OK</button>
+      </div>
+      <button type="button" class="modal__backdrop" [attr.aria-label]="t().menuClose" (click)="closeHowTo()"></button>
+    </div>
+  }
+</main>

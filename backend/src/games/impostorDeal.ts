@@ -1,0 +1,166 @@
+export type ImpostorHintMode = 'none' | 'hint' | 'category';
+export type RevealOrderMode = 'list' | 'random';
+
+export interface ImpostorWordEntry {
+  word: string;
+  hint: string;
+}
+
+export type ImpostorWordBank = Record<string, ImpostorWordEntry[]>;
+
+export function maxImpostors(playerCount: number): number {
+  const n = Math.floor(playerCount);
+  if (n < 3) return 0;
+  if (n <= 4) return 1;
+  if (n <= 6) return 2;
+  if (n <= 9) return 3;
+  if (n <= 12) return 4;
+  return Math.floor(n / 3);
+}
+
+export function clampSelectedImpostors(
+  playerCount: number,
+  selected: number,
+): number {
+  const max = maxImpostors(playerCount);
+  if (max < 1) return 0;
+  return Math.min(max, Math.max(1, Math.floor(selected)));
+}
+
+export function resolveImpostorCount(options: {
+  playerCount: number;
+  selected: number;
+  chaos: boolean;
+  rng?: () => number;
+}): number {
+  const { playerCount, chaos, rng = Math.random } = options;
+  const selected = clampSelectedImpostors(playerCount, options.selected);
+  if (!chaos) {
+    return selected;
+  }
+  const roll = rng();
+  if (roll < 0.05) return 0;
+  if (roll < 0.1) return playerCount;
+  return selected;
+}
+
+export function listCategories(bank: ImpostorWordBank): string[] {
+  return Object.keys(bank).sort();
+}
+
+export function shuffle<T>(items: readonly T[], rng: () => number = Math.random): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(rng() * (i + 1));
+    [result[i], result[j]] = [result[j]!, result[i]!];
+  }
+  return result;
+}
+
+export interface DealtPlayer {
+  name: string;
+  isImpostor: boolean;
+  revealWord: string | null;
+  revealHintMode: ImpostorHintMode;
+  revealCategory: string | null;
+  revealHintWord: string | null;
+}
+
+export function dealRound(options: {
+  names: readonly string[];
+  selectedCategories: readonly string[];
+  bank: ImpostorWordBank;
+  selectedImpostors: number;
+  chaos: boolean;
+  hintMode: ImpostorHintMode;
+  orderMode: RevealOrderMode;
+  discreet: boolean;
+  rng?: () => number;
+}): {
+  categoryId: string;
+  secretWord: string;
+  hintWord: string | null;
+  hintMode: ImpostorHintMode;
+  players: DealtPlayer[];
+  revealOrder: number[];
+  starterIndex: number;
+  impostorCount: number;
+} {
+  const rng = options.rng ?? Math.random;
+  const names = [...options.names];
+  if (names.length < 3) {
+    throw new Error('Need at least 3 players');
+  }
+
+  const categories =
+    options.selectedCategories.length > 0
+      ? options.selectedCategories.filter((id) => (options.bank[id]?.length ?? 0) > 0)
+      : listCategories(options.bank).filter((id) => (options.bank[id]?.length ?? 0) > 0);
+
+  if (categories.length === 0) {
+    throw new Error('No categories with words');
+  }
+
+  const categoryId = categories[Math.floor(rng() * categories.length)]!;
+  const entries = options.bank[categoryId]!;
+  const entry = entries[Math.floor(rng() * entries.length)]!;
+  const secretWord = entry.word;
+  const pairedHint = entry.hint.trim();
+
+  let hintMode = options.hintMode;
+  let hintWord: string | null = pairedHint.length > 0 ? pairedHint : null;
+  if (hintMode === 'hint' && hintWord === null) {
+    hintMode = 'category';
+  }
+
+  const impostorCount = resolveImpostorCount({
+    playerCount: names.length,
+    selected: options.selectedImpostors,
+    chaos: options.chaos,
+    rng,
+  });
+
+  const indices = shuffle(
+    names.map((_, i) => i),
+    rng,
+  ).slice(0, impostorCount);
+  const impostorSet = new Set(indices);
+
+  const players: DealtPlayer[] = names.map((name, index) => {
+    const isImpostor = impostorSet.has(index);
+    if (!isImpostor) {
+      return {
+        name,
+        isImpostor: false,
+        revealWord: secretWord,
+        revealHintMode: 'none',
+        revealCategory: categoryId,
+        revealHintWord: null,
+      };
+    }
+    return {
+      name,
+      isImpostor: true,
+      revealWord: null,
+      revealHintMode: hintMode,
+      revealCategory: categoryId,
+      revealHintWord: hintMode === 'hint' ? hintWord : null,
+    };
+  });
+
+  const orderIndices = Array.from({ length: names.length }, (_, i) => i);
+  const revealOrder =
+    options.orderMode === 'random' ? shuffle(orderIndices, rng) : orderIndices;
+  const starterIndex = Math.floor(rng() * names.length);
+
+  return {
+    categoryId,
+    secretWord,
+    hintWord,
+    hintMode,
+    players,
+    revealOrder,
+    starterIndex,
+    impostorCount,
+  };
+}
