@@ -37,6 +37,23 @@
   gap: var(--space-md);
 }
 
+.whoami__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+}
+
+.whoami__tools .die {
+  margin: 0;
+}
+
+.whoami__room {
+  flex: 0 1 auto;
+  text-align: center;
+}
+
 .whoami__heading {
   margin: 0;
   font: 700 var(--text-sm) / 1.2 var(--font-outlier);

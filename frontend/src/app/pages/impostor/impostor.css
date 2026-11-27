@@ -95,7 +95,25 @@
   margin-bottom: var(--space-xl);
 }
 
-.setup__howto,
+.setup__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-sm);
+  margin-block: 0 var(--space-md);
+}
+
+.setup__tools .setup__howto,
+.setup__tools .setup__room {
+  margin: 0;
+}
+
+.setup__room {
+  flex: 0 1 auto;
+  text-align: center;
+}
+
 .linkish {
   display: inline-block;
   margin-bottom: var(--space-lg);

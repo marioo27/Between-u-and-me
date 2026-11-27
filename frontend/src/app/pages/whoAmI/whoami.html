@@ -16,7 +16,14 @@
     }
 
     @if (phase() === 'setup' && loadState() === 'ready') {
-      <button type="button" class="linkish" (click)="openHowTo()">{{ t().whoamiHowToPlay }}</button>
+      <div class="whoami__tools">
+        <button type="button" class="die die--sm die--cool" (click)="openHowTo()">
+          {{ t().whoamiHowToPlay }}
+        </button>
+        <a class="die die--sm die--warm whoami__room" routerLink="/room" [queryParams]="{ game: 'whoami' }">
+          {{ t().roomPlayOnline }}
+        </a>
+      </div>
       <h2 class="whoami__heading">{{ t().roomPlayers }}</h2>
       <div class="whoami__add">
         <input

@@ -23,9 +23,14 @@
 
     @if (phase() === 'setup' && loadState() === 'ready') {
       <div class="setup">
-        <button type="button" class="setup__howto linkish" (click)="openHowTo()">
-          {{ t().impostorHowToPlay }}
-        </button>
+        <div class="setup__tools">
+          <button type="button" class="die die--sm die--cool setup__howto" (click)="openHowTo()">
+            {{ t().impostorHowToPlay }}
+          </button>
+          <a class="die die--sm die--warm setup__room" routerLink="/room" [queryParams]="{ game: 'impostor' }">
+            {{ t().roomPlayOnline }}
+          </a>
+        </div>
 
         <section class="setup__block">
           <h2 class="setup__heading">{{ t().impostorPlayers }}</h2>

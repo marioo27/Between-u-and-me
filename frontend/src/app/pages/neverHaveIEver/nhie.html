@@ -173,9 +173,14 @@
     }
 
     @if (loadState() === 'ready') {
-      <button type="button" class="game__howto linkish" (click)="openHowTo()">
-        {{ t().menuHowToPlay }}
-      </button>
+      <div class="game__tools">
+        <button type="button" class="die die--sm die--cool game__howto" (click)="openHowTo()">
+          {{ t().menuHowToPlay }}
+        </button>
+        <a class="die die--sm die--warm game__room" routerLink="/room" [queryParams]="{ game: 'nhie' }">
+          {{ t().roomPlayOnline }}
+        </a>
+      </div>
 
       @if (isEmpty()) {
         <p class="game__status game__status--empty" role="status">

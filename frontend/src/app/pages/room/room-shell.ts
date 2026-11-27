@@ -174,7 +174,16 @@ export class RoomShell implements OnInit, OnDestroy {
   }
 
   protected leave(): void {
+    const game = this.state()?.game;
     this.rooms.disconnect();
-    void this.router.navigate(['/room']);
+    if (game === 'nhie') {
+      void this.router.navigate(['/nhie']);
+    } else if (game === 'impostor') {
+      void this.router.navigate(['/impostor']);
+    } else if (game === 'whoami') {
+      void this.router.navigate(['/whoami']);
+    } else {
+      void this.router.navigate(['/']);
+    }
   }
 }

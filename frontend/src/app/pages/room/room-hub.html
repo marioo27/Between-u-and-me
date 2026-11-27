@@ -1,7 +1,7 @@
 <main class="room">
   <header class="room__bar">
     <div class="container room__bar-inner">
-      <a class="room__back" routerLink="/">Between U &amp; Me</a>
+      <a class="room__back" [routerLink]="backLink()">{{ backLabel() }}</a>
       <h1 class="display room__title">{{ t().roomTitle }}</h1>
       <app-site-menu />
     </div>
@@ -15,18 +15,28 @@
       <p class="room__error" role="alert">{{ error() }}</p>
     }
 
-    <h2 class="room__heading">{{ t().roomCreate }}</h2>
-    <div class="room__actions">
-      <button type="button" class="die" [disabled]="busy()" (click)="create('nhie')">
-        {{ t().homeNhieTitle }}
-      </button>
-      <button type="button" class="die" [disabled]="busy()" (click)="create('impostor')">
-        {{ t().homeImpostorTitle }}
-      </button>
-      <button type="button" class="die" [disabled]="busy()" (click)="create('whoami')">
-        {{ t().homeWhoamiTitle }}
-      </button>
-    </div>
+    @if (game(); as g) {
+      <p class="room__hint">{{ t().roomOnlineHint }}</p>
+      <h2 class="room__heading">{{ t().roomCreate }}</h2>
+      <div class="room__actions">
+        <button type="button" class="die" [disabled]="busy()" (click)="createForGame()">
+          {{ createLabel() }}
+        </button>
+      </div>
+    } @else {
+      <h2 class="room__heading">{{ t().roomCreate }}</h2>
+      <div class="room__actions">
+        <button type="button" class="die" [disabled]="busy()" (click)="create('nhie')">
+          {{ t().homeNhieTitle }}
+        </button>
+        <button type="button" class="die" [disabled]="busy()" (click)="create('impostor')">
+          {{ t().homeImpostorTitle }}
+        </button>
+        <button type="button" class="die" [disabled]="busy()" (click)="create('whoami')">
+          {{ t().homeWhoamiTitle }}
+        </button>
+      </div>
+    }
 
     <h2 class="room__heading">{{ t().roomJoin }}</h2>
     <div class="room__join">

@@ -21,31 +21,60 @@ export class RoomService {
     this.error.set(null);
 
     return new Promise((resolve, reject) => {
+      if (this.socket) {
+        this.socket.removeAllListeners();
+        this.socket.disconnect();
+        this.socket = null;
+      }
+
       const socket = io(environment.apiUrl, {
-        transports: ['websocket', 'polling'],
+        // Polling first: websocket-only often fails behind proxies / cold starts.
+        transports: ['polling', 'websocket'],
         autoConnect: true,
+        reconnection: true,
+        reconnectionAttempts: 8,
+        timeout: 20000,
       });
       this.socket = socket;
 
-      const onConnect = () => {
+      let settled = false;
+      const finishOk = () => {
+        if (settled) return;
+        settled = true;
         this.connecting.set(false);
         this.waking.set(false);
-        cleanup();
+        this.error.set(null);
+        clearTimeout(failTimer);
+        socket.off('connect', onConnect);
+        socket.off('connect_error', onTransientError);
         resolve();
       };
-      const onError = (err: Error) => {
+      const finishFail = (message: string) => {
+        if (settled) return;
+        settled = true;
         this.connecting.set(false);
-        this.error.set(err.message);
-        cleanup();
-        reject(err);
-      };
-      const cleanup = () => {
+        this.waking.set(false);
+        this.error.set(message);
+        clearTimeout(failTimer);
         socket.off('connect', onConnect);
-        socket.off('connect_error', onError);
+        socket.off('connect_error', onTransientError);
+        socket.disconnect();
+        this.socket = null;
+        reject(new Error(message));
       };
 
+      const onConnect = () => finishOk();
+      // Do not reject on the first connect_error — Socket.IO retries / upgrades.
+      const onTransientError = () => {
+        this.waking.set(true);
+      };
+
+      const failTimer = setTimeout(() => {
+        finishFail('No se pudo conectar con el servidor de salas.');
+      }, 20000);
+
       socket.on('connect', onConnect);
-      socket.on('connect_error', onError);
+      socket.on('connect_error', onTransientError);
       socket.on('room:state', (state: PublicRoomState) => {
         this.state.set(state);
         this.error.set(null);
@@ -55,12 +84,13 @@ export class RoomService {
       });
 
       void fetch(`${environment.apiUrl}/api/health`).catch(() => {
-        /* wake attempt */
+        /* wake attempt (Render free tier) */
       });
     });
   }
 
   disconnect(): void {
+    this.socket?.removeAllListeners();
     this.socket?.disconnect();
     this.socket = null;
     this.state.set(null);
