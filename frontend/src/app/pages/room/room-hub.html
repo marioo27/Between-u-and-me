@@ -1,4 +1,4 @@
-<main class="room">
+<main class="room room--hub">
   <header class="room__bar">
     <div class="container room__bar-inner">
       <a class="room__back" [routerLink]="backLink()">{{ backLabel() }}</a>
@@ -7,7 +7,7 @@
     </div>
   </header>
 
-  <section class="container room__panel">
+  <section class="container room__panel room__panel--hub">
     @if (waking()) {
       <p class="room__status" role="status">{{ t().roomWaking }}</p>
     }
@@ -15,43 +15,107 @@
       <p class="room__error" role="alert">{{ error() }}</p>
     }
 
-    @if (game(); as g) {
-      <p class="room__hint">{{ t().roomOnlineHint }}</p>
-      <h2 class="room__heading">{{ t().roomCreate }}</h2>
-      <div class="room__actions">
-        <button type="button" class="die" [disabled]="busy()" (click)="createForGame()">
-          {{ createLabel() }}
+    @if (mode() === 'choose') {
+      <p class="room__hint room__hint--center">{{ t().roomOnlineHint }}</p>
+      <div class="room__choice" role="group" [attr.aria-label]="t().roomTitle">
+        <button
+          type="button"
+          class="room__tile room__tile--create"
+          [disabled]="busy() || !game()"
+          (click)="onCreate()"
+        >
+          <span class="room__tile-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" focusable="false">
+              <rect x="10" y="14" width="36" height="40" rx="4" fill="none" stroke="currentColor" stroke-width="4" />
+              <path
+                d="M46 28h12M52 22v12"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="4"
+                stroke-linecap="round"
+              />
+              <circle cx="36" cy="34" r="2.5" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="room__tile-label display">{{ t().roomCreate }}</span>
+        </button>
+
+        <button
+          type="button"
+          class="room__tile room__tile--join"
+          [disabled]="busy()"
+          (click)="showJoin()"
+        >
+          <span class="room__tile-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" focusable="false">
+              <circle cx="24" cy="22" r="10" fill="none" stroke="currentColor" stroke-width="4" />
+              <path
+                d="M8 52c2-10 10-16 16-16s14 6 16 16"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="4"
+                stroke-linecap="round"
+              />
+              <circle cx="46" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="4" />
+              <path
+                d="M40 50c1.5-7 7-11 12-11 2 0 4 .5 6 1.5"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="4"
+                stroke-linecap="round"
+              />
+            </svg>
+          </span>
+          <span class="room__tile-label display">{{ t().roomJoin }}</span>
         </button>
       </div>
+      @if (!game()) {
+        <p class="room__status room__hint--center">{{ t().roomNeedGame }}</p>
+      }
     } @else {
-      <h2 class="room__heading">{{ t().roomCreate }}</h2>
-      <div class="room__actions">
-        <button type="button" class="die" [disabled]="busy()" (click)="create('nhie')">
-          {{ t().homeNhieTitle }}
+      <div class="room__join-panel">
+        <button type="button" class="room__back-choice linkish" (click)="showChoose()">
+          {{ t().roomBackChoice }}
         </button>
-        <button type="button" class="die" [disabled]="busy()" (click)="create('impostor')">
-          {{ t().homeImpostorTitle }}
-        </button>
-        <button type="button" class="die" [disabled]="busy()" (click)="create('whoami')">
-          {{ t().homeWhoamiTitle }}
-        </button>
+        <span class="room__join-icon" aria-hidden="true">
+          <svg viewBox="0 0 64 64" focusable="false">
+            <circle cx="24" cy="22" r="10" fill="none" stroke="currentColor" stroke-width="4" />
+            <path
+              d="M8 52c2-10 10-16 16-16s14 6 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+            <circle cx="46" cy="24" r="8" fill="none" stroke="currentColor" stroke-width="4" />
+            <path
+              d="M40 50c1.5-7 7-11 12-11 2 0 4 .5 6 1.5"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="4"
+              stroke-linecap="round"
+            />
+          </svg>
+        </span>
+        <h2 class="room__heading room__heading--center">{{ t().roomJoin }}</h2>
+        <div class="room__join room__join--center">
+          <input
+            class="room__input"
+            type="text"
+            inputmode="text"
+            autocomplete="off"
+            autocapitalize="characters"
+            maxlength="6"
+            [value]="joinCode()"
+            [attr.placeholder]="t().roomCodePlaceholder"
+            (input)="joinCode.set($any($event.target).value.toUpperCase())"
+            (keydown.enter)="$event.preventDefault(); join()"
+          />
+          <button type="button" class="die" [disabled]="busy()" (click)="join()">
+            {{ t().roomJoinCta }}
+          </button>
+        </div>
       </div>
     }
-
-    <h2 class="room__heading">{{ t().roomJoin }}</h2>
-    <div class="room__join">
-      <input
-        class="room__input"
-        type="text"
-        maxlength="6"
-        [value]="joinCode()"
-        [attr.placeholder]="t().roomCodePlaceholder"
-        (input)="joinCode.set($any($event.target).value.toUpperCase())"
-        (keydown.enter)="$event.preventDefault(); join()"
-      />
-      <button type="button" class="die" [disabled]="busy()" (click)="join()">
-        {{ t().roomJoinCta }}
-      </button>
-    </div>
   </section>
 </main>

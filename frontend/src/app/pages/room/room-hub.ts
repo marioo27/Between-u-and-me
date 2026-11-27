@@ -22,7 +22,8 @@ export class RoomHub {
   private readonly rooms = inject(RoomService);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
-  protected readonly t = inject(I18nService).t;
+  private readonly i18n = inject(I18nService);
+  protected readonly t = this.i18n.t;
 
   private readonly gameParam = toSignal(
     this.route.queryParamMap.pipe(map((p) => parseGame(p.get('game')))),
@@ -45,36 +46,46 @@ export class RoomHub {
     if (g === 'whoami') return m.homeWhoamiTitle;
     return 'Between U & Me';
   });
-  protected readonly createLabel = computed(() => {
-    const g = this.game();
-    const m = this.t();
-    if (g === 'nhie') return m.homeNhieTitle;
-    if (g === 'impostor') return m.homeImpostorTitle;
-    if (g === 'whoami') return m.homeWhoamiTitle;
-    return m.roomCreate;
-  });
 
+  protected readonly mode = signal<'choose' | 'join'>('choose');
   protected readonly joinCode = signal('');
   protected readonly busy = signal(false);
   protected readonly error = this.rooms.error;
   protected readonly waking = this.rooms.waking;
 
-  protected async create(game: GameId): Promise<void> {
+  constructor() {
+    const fromQuery = this.route.snapshot.queryParamMap.get('error');
+    if (fromQuery) {
+      this.rooms.error.set(fromQuery);
+    }
+  }
+
+  protected showJoin(): void {
+    this.mode.set('join');
+    this.rooms.error.set(null);
+  }
+
+  protected showChoose(): void {
+    this.mode.set('choose');
+    this.joinCode.set('');
+    this.rooms.error.set(null);
+  }
+
+  protected async onCreate(): Promise<void> {
+    const g = this.game();
+    if (!g) {
+      this.rooms.error.set(this.t().roomNeedGame);
+      return;
+    }
     this.busy.set(true);
     try {
-      const state = await this.rooms.create(game);
+      const state = await this.rooms.create(g);
       await this.router.navigate(['/room', state.code]);
     } catch (err) {
       this.rooms.error.set(err instanceof Error ? err.message : 'Error');
     } finally {
       this.busy.set(false);
     }
-  }
-
-  protected async createForGame(): Promise<void> {
-    const g = this.game();
-    if (!g) return;
-    await this.create(g);
   }
 
   protected async join(): Promise<void> {

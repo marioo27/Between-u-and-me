@@ -63,8 +63,11 @@ export class RoomShell implements OnInit, OnDestroy {
         await this.rooms.join(code);
       }
       this.draftClaim.set([...(this.rooms.state()?.yourSeatIds ?? [])]);
-    } catch {
-      await this.router.navigate(['/room']);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : this.t().roomNotFound;
+      await this.router.navigate(['/room'], {
+        queryParams: { error: message },
+      });
     }
   }
 
@@ -137,14 +140,15 @@ export class RoomShell implements OnInit, OnDestroy {
   }
 
   protected async nextReveal(): Promise<void> {
-    if (!this.hasRevealed()) return;
+    // Host advances for others; only block if it's THIS phone's turn and they haven't held.
+    if (this.isYourRevealTurn() && !this.hasRevealed()) return;
     this.holding.set(false);
     this.hasRevealed.set(false);
     await this.rooms.action('nextReveal');
   }
 
   protected async goPlay(): Promise<void> {
-    if (!this.hasRevealed()) return;
+    if (this.isYourRevealTurn() && !this.hasRevealed()) return;
     this.holding.set(false);
     await this.rooms.action('goPlay');
   }

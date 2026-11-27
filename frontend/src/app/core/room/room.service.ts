@@ -70,7 +70,7 @@ export class RoomService {
       };
 
       const failTimer = setTimeout(() => {
-        finishFail('No se pudo conectar con el servidor de salas.');
+        finishFail('Room server unreachable');
       }, 20000);
 
       socket.on('connect', onConnect);

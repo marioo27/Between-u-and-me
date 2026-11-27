@@ -158,11 +158,23 @@
             }
             @if (st.youAreHost) {
               @if (imp.revealIndex >= imp.revealOrder.length - 1) {
-                <button type="button" class="die" [disabled]="!hasRevealed() && isYourRevealTurn()" (click)="goPlay()">
+                <button
+                  type="button"
+                  class="die"
+                  [disabled]="isYourRevealTurn() && !hasRevealed()"
+                  (click)="goPlay()"
+                >
                   {{ t().impostorStartGame }}
                 </button>
               } @else {
-                <button type="button" class="die" (click)="nextReveal()">{{ t().impostorNext }}</button>
+                <button
+                  type="button"
+                  class="die"
+                  [disabled]="isYourRevealTurn() && !hasRevealed()"
+                  (click)="nextReveal()"
+                >
+                  {{ t().impostorNext }}
+                </button>
               }
             }
           }

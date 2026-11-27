@@ -38,6 +38,166 @@
   gap: var(--space-md);
 }
 
+.room--hub {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.room__panel--hub {
+  flex: 1;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-lg);
+  padding-block: var(--space-lg) var(--space-2xl);
+  min-height: calc(100dvh - 3.5rem);
+}
+
+.room__hint--center,
+.room__heading--center {
+  text-align: center;
+  max-width: 28ch;
+}
+
+.room__choice {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--space-md);
+  width: min(100%, 22rem);
+}
+
+.room__tile {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  min-height: 10.5rem;
+  padding: var(--space-lg) var(--space-md);
+  border: var(--sticker-border) solid var(--sticker-edge);
+  border-radius: var(--sticker-radius);
+  background: var(--sticker-fill);
+  color: var(--sticker-ink);
+  box-shadow: var(--sticker-offset) var(--sticker-offset) 0 var(--sticker-shadow);
+  transform: rotate(-1.5deg);
+  cursor: pointer;
+  transition:
+    transform var(--dur-short) var(--ease-out),
+    box-shadow var(--dur-short) var(--ease-out);
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.room__tile--join {
+  background: var(--color-accent);
+  color: var(--color-accent-ink);
+  transform: rotate(1.5deg);
+}
+
+.room__tile:hover:not(:disabled) {
+  transform: rotate(-1.5deg) translate(-2px, -2px);
+  box-shadow:
+    calc(var(--sticker-offset) + 2px) calc(var(--sticker-offset) + 2px) 0
+    var(--sticker-shadow);
+}
+
+.room__tile--join:hover:not(:disabled) {
+  transform: rotate(1.5deg) translate(-2px, -2px);
+}
+
+.room__tile:active:not(:disabled) {
+  transform: rotate(-1.5deg) translate(var(--space-3xs), var(--space-3xs));
+  box-shadow: var(--space-2xs) var(--space-2xs) 0 var(--sticker-shadow);
+}
+
+.room__tile--join:active:not(:disabled) {
+  transform: rotate(1.5deg) translate(var(--space-3xs), var(--space-3xs));
+}
+
+.room__tile:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.room__tile:focus-visible {
+  outline: 3px solid var(--color-focus);
+  outline-offset: 4px;
+}
+
+.room__tile-icon {
+  display: grid;
+  place-items: center;
+  width: clamp(4.5rem, 18vw, 5.75rem);
+  height: clamp(4.5rem, 18vw, 5.75rem);
+}
+
+.room__tile-icon svg,
+.room__join-icon svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.room__tile-label {
+  margin: 0;
+  font-size: clamp(1.15rem, 4.5vw, 1.45rem);
+  letter-spacing: var(--tracking-display);
+  text-transform: uppercase;
+  text-align: center;
+  text-wrap: balance;
+}
+
+.room__join-panel {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-md);
+  width: min(100%, 24rem);
+}
+
+.room__join-icon {
+  width: clamp(3.5rem, 14vw, 4.5rem);
+  height: clamp(3.5rem, 14vw, 4.5rem);
+  color: var(--color-ink);
+}
+
+.room__join--center {
+  width: 100%;
+  flex-wrap: nowrap;
+}
+
+.room__join--center .room__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-size: 1.125rem;
+  letter-spacing: 0.12em;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+@media (min-width: 40rem) {
+  .room__choice {
+    grid-template-columns: 1fr 1fr;
+    width: min(100%, 36rem);
+    gap: var(--space-lg);
+  }
+
+  .room__tile {
+    min-height: 12rem;
+  }
+}
+
+@media (max-width: 22rem) {
+  .room__join--center {
+    flex-direction: column;
+  }
+
+  .room__join--center .die {
+    width: 100%;
+    text-align: center;
+  }
+}
+
 .room__heading {
   margin: var(--space-md) 0 0;
   font: 700 var(--text-sm) / 1.2 var(--font-outlier);
@@ -51,6 +211,27 @@
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-sm);
+}
+
+.room__actions--stack {
+  flex-direction: column;
+  align-items: stretch;
+  max-width: 22rem;
+}
+
+.room__actions--stack .die {
+  text-align: center;
+}
+
+.room__back-choice {
+  justify-self: start;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .room__input {
@@ -117,11 +298,13 @@
 }
 
 .chip {
-  padding: 0.4rem 0.7rem;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.9rem;
   border: 2px solid var(--color-ink);
   background: transparent;
   font: 600 var(--text-sm) / 1 var(--font-outlier);
   cursor: pointer;
+  touch-action: manipulation;
 }
 
 .chip--active {
