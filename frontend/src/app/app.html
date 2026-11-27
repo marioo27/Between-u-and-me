@@ -1,1 +1,4 @@
+@if (!splashDone()) {
+  <app-brand-splash (closed)="onSplashClosed()" />
+}
 <router-outlet />

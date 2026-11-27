@@ -1,0 +1,33 @@
+@if (visible()) {
+  <div
+    class="splash"
+    [class.splash--out]="fading()"
+    role="dialog"
+    aria-label="Between U & Me"
+    (click)="skip()"
+  >
+    @if (useStatic()) {
+      <img
+        class="splash__logo"
+        src="/brand/logo-full.png"
+        width="1024"
+        height="571"
+        alt="Between U & Me"
+        decoding="async"
+      />
+    } @else {
+      <video
+        class="splash__media"
+        autoplay
+        muted
+        playsinline
+        loop
+        poster="/brand/logo-full.png"
+        (error)="useStatic.set(true)"
+      >
+        <source src="/brand/toast-blue.webm" type="video/webm" />
+      </video>
+    }
+    <p class="splash__hint">{{ t().splashSkip }}</p>
+  </div>
+}

@@ -1,8 +1,8 @@
 import { readFileSync } from 'node:fs';
 import { dataFile } from '../dataPath.js';
-import type { Room } from '../types.js';
+import type { Room, WhoamiCharacter } from '../types.js';
 
-type Bank = { name: string }[];
+type Bank = WhoamiCharacter[];
 
 function loadBank(locale: 'es' | 'en'): Bank {
   const file = locale === 'es' ? 'whoami-es.json' : 'whoami-en.json';
@@ -26,9 +26,10 @@ export function startWhoAmI(room: Room, locale: 'es' | 'en' = 'es'): void {
   if (bank.length < room.seats.length) {
     throw new Error('Not enough characters');
   }
-  const characters = new Map<string, string>();
+  const characters = new Map<string, WhoamiCharacter>();
   room.seats.forEach((seat, i) => {
-    characters.set(seat.id, bank[i]!.name);
+    const entry = bank[i]!;
+    characters.set(seat.id, { name: entry.name, wiki: entry.wiki });
   });
   room.whoami = {
     locale,
@@ -45,14 +46,14 @@ export function startWhoAmI(room: Room, locale: 'es' | 'en' = 'es'): void {
 export function whoamiVisibleFor(
   room: Room,
   yourSeatIds: string[],
-): Record<string, string> {
-  const out: Record<string, string> = {};
+): Record<string, WhoamiCharacter> {
+  const out: Record<string, WhoamiCharacter> = {};
   const chars = room.whoami?.characters;
   if (!chars) return out;
   const yours = new Set(yourSeatIds);
-  for (const [seatId, name] of chars) {
+  for (const [seatId, character] of chars) {
     if (!yours.has(seatId)) {
-      out[seatId] = name;
+      out[seatId] = character;
     }
   }
   return out;

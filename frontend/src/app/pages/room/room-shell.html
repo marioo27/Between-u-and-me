@@ -1,7 +1,8 @@
 <main class="room">
+  <app-game-atmosphere [preset]="atmPreset()" />
   <header class="room__bar">
     <div class="container room__bar-inner">
-      <button type="button" class="room__back linkish" (click)="leave()">{{ t().roomLeave }}</button>
+      <button type="button" class="room__back linkish" (click)="beginLeave()">{{ t().roomLeave }}</button>
       <h1 class="display room__title">{{ state()?.code }}</h1>
       <app-site-menu />
     </div>
@@ -61,10 +62,92 @@
         </ul>
         @if (st.youAreHost) {
           @if (st.game === 'impostor') {
+            <section class="room__setup">
+              <h2 class="room__heading">{{ t().impostorCategories }}</h2>
+              <div class="room__dropdown">
+                <button
+                  type="button"
+                  class="room__dropdown-toggle"
+                  [attr.aria-expanded]="categoriesOpen()"
+                  (click)="toggleCategoriesOpen()"
+                >
+                  <span>{{ categoriesSummary() }}</span>
+                </button>
+                @if (categoriesOpen()) {
+                  <div class="room__chips" role="group" [attr.aria-label]="t().impostorCategories">
+                    <button
+                      type="button"
+                      class="chip"
+                      [class.chip--active]="allCategoriesSelected()"
+                      (click)="toggleAllCategories()"
+                    >
+                      {{ t().impostorAllCategories }}
+                    </button>
+                    @for (cat of categories(); track cat) {
+                      <button
+                        type="button"
+                        class="chip"
+                        [class.chip--active]="isCategorySelected(cat)"
+                        (click)="toggleCategory(cat)"
+                      >
+                        {{ categoryLabel(cat) }}
+                      </button>
+                    }
+                  </div>
+                }
+              </div>
+
+              <h2 class="room__heading">{{ t().impostorImpostors }}</h2>
+              <p class="room__hint">
+                {{ t().impostorImpostorsHint.replace('{max}', '' + maxImp()) }}
+              </p>
+              <input
+                class="room__range"
+                type="range"
+                min="1"
+                [max]="maxImp() || 1"
+                [value]="selectedImpostors()"
+                [disabled]="maxImp() < 1"
+                (input)="setImpostors(+$any($event.target).value)"
+              />
+              <p class="room__status">{{ selectedImpostors() }}</p>
+              <label class="room__check">
+                <input type="checkbox" [checked]="chaos()" (change)="chaos.set($any($event.target).checked)" />
+                <span><strong>{{ t().impostorChaos }}</strong> — {{ t().impostorChaosHint }}</span>
+              </label>
+
+              <h2 class="room__heading">{{ t().impostorHintMode }}</h2>
+              <div class="room__chips">
+                <button type="button" class="chip" [class.chip--active]="hintMode() === 'none'" (click)="setHintMode('none')">
+                  {{ t().impostorHintNone }}
+                </button>
+                <button type="button" class="chip" [class.chip--active]="hintMode() === 'hint'" (click)="setHintMode('hint')">
+                  {{ t().impostorHintWord }}
+                </button>
+                <button type="button" class="chip" [class.chip--active]="hintMode() === 'category'" (click)="setHintMode('category')">
+                  {{ t().impostorHintCategory }}
+                </button>
+              </div>
+
+              <h2 class="room__heading">{{ t().impostorOrder }}</h2>
+              <div class="room__chips">
+                <button type="button" class="chip" [class.chip--active]="orderMode() === 'list'" (click)="setOrderMode('list')">
+                  {{ t().impostorOrderList }}
+                </button>
+                <button type="button" class="chip" [class.chip--active]="orderMode() === 'random'" (click)="setOrderMode('random')">
+                  {{ t().impostorOrderRandom }}
+                </button>
+              </div>
+
+              <label class="room__check">
+                <input type="checkbox" [checked]="discreet()" (change)="discreet.set($any($event.target).checked)" />
+                <span><strong>{{ t().impostorDiscreet }}</strong> — {{ t().impostorDiscreetHint }}</span>
+              </label>
+            </section>
             <button
               type="button"
               class="die"
-              [disabled]="st.seats.length < 3"
+              [disabled]="st.seats.length < 3 || selectedCategories().length === 0"
               (click)="startImpostor()"
             >
               {{ t().roomStart }}
@@ -126,7 +209,6 @@
             <p class="room__hint">{{ t().impostorPassTo }}</p>
             <p class="display room__phrase">{{ seatName()(rid) }}</p>
             @if (isYourRevealTurn()) {
-              <p class="room__hint">{{ t().impostorHold }}</p>
               <button
                 type="button"
                 class="flip-card"
@@ -136,7 +218,10 @@
                 (pointerleave)="holdEnd()"
                 (pointercancel)="holdEnd()"
               >
-                <span class="flip-card__face flip-card__face--back">{{ seatName()(rid) }}</span>
+                <span class="flip-card__face flip-card__face--back">
+                  <span class="flip-card__name">{{ seatName()(rid) }}</span>
+                  <span class="flip-card__hold">{{ t().impostorHold }}</span>
+                </span>
                 <span class="flip-card__face flip-card__face--front">
                   @if (secretFor(rid); as sec) {
                     @if (sec.isImpostor) {
@@ -208,11 +293,15 @@
       @if (st.game === 'whoami' && st.phase === 'playing' && st.whoami) {
         <h2 class="room__heading">{{ t().whoamiAnswerTo }}</h2>
         <p class="room__hint">{{ t().whoamiPlayHint }}</p>
-        <ul class="room__whoami">
+        <ul class="room__whoami whoami__seen" [attr.data-count]="visibleWhoami().length">
           @for (row of visibleWhoami(); track row.id) {
-            <li>
-              <span class="room__whoami-name">{{ row.name }}</span>
-              <span class="display room__whoami-char">{{ row.character }}</span>
+            <li class="whoami__seen-item">
+              <span class="whoami__seen-player">{{ row.name }}</span>
+              <app-whoami-portrait
+                [name]="row.character"
+                [wiki]="row.wiki"
+                [size]="whoamiPortraitSize()"
+              />
             </li>
           }
         </ul>
@@ -222,4 +311,21 @@
       }
     }
   </section>
+
+  @if (leaveConfirm() !== 'idle') {
+    <div class="modal" role="dialog" [attr.aria-label]="t().roomLeave">
+      <div class="modal__card">
+        <h2 class="display">
+          {{ leaveConfirm() === 'one' ? t().roomLeaveConfirm1 : t().roomLeaveConfirm2 }}
+        </h2>
+        <div class="modal__actions">
+          <button type="button" class="die" (click)="dismissLeave()">{{ t().roomLeaveNo }}</button>
+          <button type="button" class="modal__danger" (click)="confirmLeaveStep()">
+            {{ t().roomLeaveYes }}
+          </button>
+        </div>
+      </div>
+      <button type="button" class="modal__backdrop" [attr.aria-label]="t().menuClose" (click)="dismissLeave()"></button>
+    </div>
+  }
 </main>

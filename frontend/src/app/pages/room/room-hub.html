@@ -1,4 +1,5 @@
 <main class="room room--hub">
+  <app-game-atmosphere [preset]="atmPreset()" />
   <header class="room__bar">
     <div class="container room__bar-inner">
       <a class="room__back" [routerLink]="backLink()">{{ backLabel() }}</a>

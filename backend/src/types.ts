@@ -12,11 +12,6 @@ export interface Seat {
   name: string;
 }
 
-export interface DeviceClaim {
-  socketId: string;
-  seatIds: string[];
-}
-
 export interface NhiePublicState {
   phrase: string | null;
   category: string | null;
@@ -51,6 +46,11 @@ export interface ImpostorPublicState {
   setup: ImpostorSetup;
 }
 
+export interface WhoamiCharacter {
+  name: string;
+  wiki?: string;
+}
+
 export interface WhoAmIPublicState {
   phase: 'memorize' | 'play';
   memorizeIndex: number;
@@ -59,10 +59,16 @@ export interface WhoAmIPublicState {
 export interface Room {
   code: string;
   game: GameId;
-  hostSocketId: string;
+  /** Host is a device, not a raw socket — survives reconnect. */
+  hostDeviceId: string;
   phase: RoomPhase;
   seats: Seat[];
+  /** deviceId → claimed seat ids */
   claims: Map<string, string[]>;
+  /** socketId → deviceId */
+  deviceBySocket: Map<string, string>;
+  /** deviceId → current socketId (if online) */
+  socketByDevice: Map<string, string>;
   createdAt: number;
   lastActiveAt: number;
   connectedSocketIds: Set<string>;
@@ -78,7 +84,7 @@ export interface Room {
   };
   whoami?: {
     locale: 'es' | 'en';
-    characters: Map<string, string>;
+    characters: Map<string, WhoamiCharacter>;
     public: WhoAmIPublicState;
   };
 }
@@ -87,7 +93,7 @@ export interface PublicRoomState {
   code: string;
   game: GameId;
   phase: RoomPhase;
-  hostSocketId: string;
+  hostDeviceId: string;
   seats: Seat[];
   claims: Record<string, string[]>;
   connectedCount: number;
@@ -98,6 +104,6 @@ export interface PublicRoomState {
     yourSecrets?: Record<string, ImpostorSeatSecret>;
   };
   whoami?: WhoAmIPublicState & {
-    visibleCharacters?: Record<string, string>;
+    visibleCharacters?: Record<string, WhoamiCharacter>;
   };
 }

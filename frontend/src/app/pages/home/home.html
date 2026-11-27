@@ -1,20 +1,50 @@
 <main class="home">
+  <app-game-atmosphere preset="home" />
   <header class="masthead">
     <div class="container masthead__bar">
-      <a class="wordmark display" href="#top">Between U &amp; Me</a>
+      <a class="wordmark display" href="#top">
+        <img class="wordmark__mark" src="/brand/mark-paper.png" width="40" height="40" alt="" />
+        Between U &amp; Me
+      </a>
       <div class="masthead__actions">
-        <a class="masthead__link" href="#juegos">{{ t().homeNavGames }}</a>
         <app-site-menu />
       </div>
     </div>
   </header>
 
   <section class="hero" id="top" aria-labelledby="home-title">
+    <div class="hero__brand" aria-hidden="true">
+      <video
+        class="hero__mark"
+        autoplay
+        muted
+        playsinline
+        loop
+        poster="/brand/logo-full.png"
+        width="1280"
+        height="720"
+      >
+        <source src="/brand/toast-blue.webm" type="video/webm" />
+      </video>
+    </div>
     <div class="container hero__grid">
       <div class="hero__copy">
         <h1 id="home-title" class="display hero__title">Between U &amp; Me</h1>
-        <p class="hero__lead">{{ t().homeLead }}</p>
       </div>
+      <ul class="bills" [attr.aria-label]="t().homeMomentsTitle">
+        <li class="bill bill--blue">
+          <h2 class="display bill__title">{{ t().homeLeadTitle }}</h2>
+          <p>{{ t().homeLead }}</p>
+        </li>
+        <li class="bill bill--green">
+          <h2 class="display bill__title">{{ t().homeMomentsTitle }}</h2>
+          <p>{{ t().homeMoment1Body }}</p>
+        </li>
+        <li class="bill bill--orange">
+          <h2 class="display bill__title">{{ t().homeMoment2Title }}</h2>
+          <p>{{ t().homeMoment2Body }}</p>
+        </li>
+      </ul>
     </div>
   </section>
 
@@ -38,29 +68,6 @@
           <a class="die" routerLink="/whoami">{{ t().homeWhoamiPlay }}</a>
         </article>
       </div>
-    </div>
-  </section>
-
-  <section class="moments" id="momentos" aria-labelledby="moments-title">
-    <div class="container">
-      <h2 id="moments-title" class="display moments__title">{{ t().homeMomentsTitle }}</h2>
-      <ol class="bills">
-        <li class="bill pass-1">
-          <span class="bill__n display">1</span>
-          <h3 class="display bill__title">{{ t().homeMoment1Title }}</h3>
-          <p>{{ t().homeMoment1Body }}</p>
-        </li>
-        <li class="bill pass-2">
-          <span class="bill__n display">2</span>
-          <h3 class="display bill__title">{{ t().homeMoment2Title }}</h3>
-          <p>{{ t().homeMoment2Body }}</p>
-        </li>
-        <li class="bill pass-1">
-          <span class="bill__n display">3</span>
-          <h3 class="display bill__title">{{ t().homeMoment3Title }}</h3>
-          <p>{{ t().homeMoment3Body }}</p>
-        </li>
-      </ol>
     </div>
   </section>
 

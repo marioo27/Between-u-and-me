@@ -2,7 +2,8 @@
   display: flex;
   flex-direction: column;
   min-height: 100%;
-  background: var(--color-paper);
+  background: var(--atmosphere-paper, var(--color-paper));
+  transition: background-color 0.45s var(--ease-out);
 }
 
 .game {
@@ -11,7 +12,13 @@
   flex-direction: column;
   flex: 1 1 auto;
   min-height: 100%;
+  background: transparent;
   color: var(--color-ink);
+}
+
+.game > :not(.atmosphere) {
+  position: relative;
+  z-index: 1;
 }
 
 .game__bar {
@@ -434,7 +441,18 @@
 
 .flip-card__face--back {
   transform: rotateY(0deg);
+}
+
+.flip-card__name {
   font: 700 clamp(1.35rem, 4.5vw, 1.85rem) / 1.2 var(--font-outlier);
+  text-align: center;
+}
+
+.flip-card__hold {
+  color: var(--color-muted);
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .flip-card__face--front {

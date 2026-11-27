@@ -35,32 +35,60 @@ function seatId(): string {
   return `s_${randomBytes(4).toString('hex')}`;
 }
 
+function bindSocket(room: Room, socketId: string, deviceId: string): void {
+  const previousSocket = room.socketByDevice.get(deviceId);
+  if (previousSocket && previousSocket !== socketId) {
+    room.connectedSocketIds.delete(previousSocket);
+    room.deviceBySocket.delete(previousSocket);
+  }
+  room.deviceBySocket.set(socketId, deviceId);
+  room.socketByDevice.set(deviceId, socketId);
+  room.connectedSocketIds.add(socketId);
+}
+
+function deviceOf(room: Room, socketId: string): string {
+  const deviceId = room.deviceBySocket.get(socketId);
+  if (!deviceId) throw new Error('Unknown device');
+  return deviceId;
+}
+
+export function isHostSocket(room: Room, socketId: string): boolean {
+  return room.hostDeviceId === room.deviceBySocket.get(socketId);
+}
+
+function pickHost(room: Room): void {
+  if (room.socketByDevice.has(room.hostDeviceId)) return;
+  const nextDevice = [...room.socketByDevice.keys()][0];
+  if (nextDevice) room.hostDeviceId = nextDevice;
+}
+
 export function cleanupRooms(): void {
   const now = Date.now();
   for (const [code, room] of rooms) {
-    if (now - room.lastActiveAt > ROOM_TTL_MS || room.connectedSocketIds.size === 0) {
-      if (now - room.lastActiveAt > ROOM_TTL_MS) {
-        rooms.delete(code);
-      }
+    if (now - room.lastActiveAt > ROOM_TTL_MS) {
+      rooms.delete(code);
     }
   }
 }
 
 setInterval(cleanupRooms, 60_000).unref?.();
 
-export function createRoom(game: GameId, hostSocketId: string): Room {
+export function createRoom(game: GameId, hostSocketId: string, deviceId: string): Room {
   const code = makeCode();
   const room: Room = {
     code,
     game,
-    hostSocketId,
+    hostDeviceId: deviceId,
     phase: 'lobby',
     seats: [],
     claims: new Map(),
+    deviceBySocket: new Map(),
+    socketByDevice: new Map(),
     createdAt: Date.now(),
     lastActiveAt: Date.now(),
-    connectedSocketIds: new Set([hostSocketId]),
+    connectedSocketIds: new Set(),
   };
+  bindSocket(room, hostSocketId, deviceId);
   if (game === 'nhie') {
     initNhie(room, 'es');
   }
@@ -72,12 +100,13 @@ export function getRoom(code: string): Room | undefined {
   return rooms.get(code.toUpperCase());
 }
 
-export function joinRoom(code: string, socketId: string): Room {
+export function joinRoom(code: string, socketId: string, deviceId: string): Room {
   const room = getRoom(code);
   if (!room) {
     throw new Error('Room not found');
   }
-  room.connectedSocketIds.add(socketId);
+  bindSocket(room, socketId, deviceId);
+  pickHost(room);
   touch(room);
   return room;
 }
@@ -86,12 +115,14 @@ export function leaveSocket(socketId: string): Room[] {
   const touched: Room[] = [];
   for (const room of rooms.values()) {
     if (!room.connectedSocketIds.has(socketId)) continue;
+    const deviceId = room.deviceBySocket.get(socketId);
     room.connectedSocketIds.delete(socketId);
-    room.claims.delete(socketId);
-    if (room.hostSocketId === socketId) {
-      const next = [...room.connectedSocketIds][0];
-      if (next) room.hostSocketId = next;
+    room.deviceBySocket.delete(socketId);
+    if (deviceId && room.socketByDevice.get(deviceId) === socketId) {
+      room.socketByDevice.delete(deviceId);
+      // Keep claims for deviceId so reconnect restores seats.
     }
+    pickHost(room);
     touch(room);
     touched.push(room);
   }
@@ -109,6 +140,7 @@ export function setSeats(room: Room, names: string[]): void {
     .map((n) => n.trim())
     .filter(Boolean)
     .map((name) => ({ id: seatId(), name }));
+  room.claims.clear();
   touch(room);
 }
 
@@ -116,11 +148,12 @@ export function claimSeats(room: Room, socketId: string, seatIds: string[]): voi
   if (room.game === 'nhie') {
     throw new Error('NHIE has no claims');
   }
+  const deviceId = deviceOf(room, socketId);
   const valid = new Set(room.seats.map((s) => s.id));
   const unique = [...new Set(seatIds.filter((id) => valid.has(id)))];
 
-  for (const [otherSocket, claimed] of room.claims) {
-    if (otherSocket === socketId) continue;
+  for (const [otherDevice, claimed] of room.claims) {
+    if (otherDevice === deviceId) continue;
     for (const id of unique) {
       if (claimed.includes(id)) {
         throw new Error('Seat already claimed');
@@ -128,29 +161,30 @@ export function claimSeats(room: Room, socketId: string, seatIds: string[]): voi
     }
   }
 
-  room.claims.set(socketId, unique);
+  room.claims.set(deviceId, unique);
   touch(room);
 }
 
 function claimsRecord(room: Room): Record<string, string[]> {
   const out: Record<string, string[]> = {};
-  for (const [socketId, seats] of room.claims) {
-    out[socketId] = seats;
+  for (const [deviceId, seats] of room.claims) {
+    out[deviceId] = seats;
   }
   return out;
 }
 
 export function publicState(room: Room, socketId: string): PublicRoomState {
-  const yourSeatIds = room.claims.get(socketId) ?? [];
+  const deviceId = room.deviceBySocket.get(socketId);
+  const yourSeatIds = deviceId ? (room.claims.get(deviceId) ?? []) : [];
   const base: PublicRoomState = {
     code: room.code,
     game: room.game,
     phase: room.phase,
-    hostSocketId: room.hostSocketId,
+    hostDeviceId: room.hostDeviceId,
     seats: room.seats,
     claims: claimsRecord(room),
     connectedCount: room.connectedSocketIds.size,
-    youAreHost: room.hostSocketId === socketId,
+    youAreHost: !!deviceId && room.hostDeviceId === deviceId,
     yourSeatIds,
   };
 
@@ -183,7 +217,7 @@ export function startGame(
     impostorSetup?: ImpostorSetup;
   },
 ): void {
-  if (room.hostSocketId !== socketId) {
+  if (!isHostSocket(room, socketId)) {
     throw new Error('Only host can start');
   }
 
@@ -218,7 +252,7 @@ export function gameAction(
 
   if (room.game === 'nhie') {
     if (action === 'next') {
-      if (room.hostSocketId !== socketId) throw new Error('Only host advances');
+      if (!isHostSocket(room, socketId)) throw new Error('Only host advances');
       nhieNext(room);
     }
     return;
@@ -226,16 +260,16 @@ export function gameAction(
 
   if (room.game === 'impostor') {
     if (action === 'nextReveal') {
-      if (room.hostSocketId !== socketId) throw new Error('Only host advances');
+      if (!isHostSocket(room, socketId)) throw new Error('Only host advances');
       impostorAdvanceReveal(room);
     } else if (action === 'goPlay') {
-      if (room.hostSocketId !== socketId) throw new Error('Only host advances');
+      if (!isHostSocket(room, socketId)) throw new Error('Only host advances');
       impostorGoPlay(room);
     } else if (action === 'revealImpostors') {
-      if (room.hostSocketId !== socketId) throw new Error('Only host reveals');
+      if (!isHostSocket(room, socketId)) throw new Error('Only host reveals');
       impostorReveal(room);
     } else if (action === 'finishClaim') {
-      if (room.hostSocketId !== socketId) throw new Error('Only host continues');
+      if (!isHostSocket(room, socketId)) throw new Error('Only host continues');
       room.phase = 'playing';
       if (room.impostor) room.impostor.public.phase = 'reveal';
     }
@@ -244,7 +278,7 @@ export function gameAction(
 
   if (room.game === 'whoami') {
     if (action === 'finishClaim' || action === 'startPlay') {
-      if (room.hostSocketId !== socketId) throw new Error('Only host continues');
+      if (!isHostSocket(room, socketId)) throw new Error('Only host continues');
       whoamiStartPlay(room);
     }
     void data;
@@ -263,5 +297,11 @@ export function addSeat(room: Room, name: string): Seat {
 export function removeSeat(room: Room, id: string): void {
   if (room.phase !== 'lobby') throw new Error('Cannot edit seats now');
   room.seats = room.seats.filter((s) => s.id !== id);
+  for (const [deviceId, seats] of room.claims) {
+    room.claims.set(
+      deviceId,
+      seats.filter((seat) => seat !== id),
+    );
+  }
   touch(room);
 }

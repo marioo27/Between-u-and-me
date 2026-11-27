@@ -10,11 +10,19 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { I18nService, Locale } from '../../core/i18n/i18n';
+import type { WhoamiCharacter } from '../../core/whoami/whoami-portrait';
+import { GameAtmosphere } from '../../shared/game-atmosphere/game-atmosphere';
+import { GAME_ATMOSPHERE } from '../../shared/game-atmosphere/game-atmosphere.model';
 import { SiteMenu } from '../../shared/site-menu/site-menu';
+import {
+  PortraitSize,
+  WhoamiPortrait,
+} from '../../shared/whoami-portrait/whoami-portrait';
 
 type LoadState = 'loading' | 'ready' | 'error';
 type Phase = 'setup' | 'memorize' | 'play';
 type SetupPlayer = { id: string; name: string };
+type CancelConfirm = 'idle' | 'one' | 'two';
 
 let seq = 0;
 function nextId(): string {
@@ -28,26 +36,33 @@ const FILES: Record<Locale, string> = {
 };
 
 @Component({
-  imports: [RouterLink, SiteMenu],
+  imports: [RouterLink, SiteMenu, WhoamiPortrait, GameAtmosphere],
   selector: 'app-whoami',
-  styleUrl: './whoami.css',
+  styleUrls: ['./whoami.css', '../../shared/whoami-portrait/whoami-seen-layout.css'],
   templateUrl: './whoami.html',
+  host: {
+    '[style.--atmosphere-paper]': 'atm.paper',
+    '[style.--atmosphere-ink]': 'atm.ink',
+    '[style.background]': 'atm.paper',
+  },
 })
 export class WhoAmI {
   private readonly http = inject(HttpClient);
   private readonly i18n = inject(I18nService);
   private readonly destroyRef = inject(DestroyRef);
 
+  protected readonly atm = GAME_ATMOSPHERE.whoami;
   protected readonly t = this.i18n.t;
   protected readonly loadState = signal<LoadState>('loading');
-  protected readonly bank = signal<{ name: string }[]>([]);
+  protected readonly bank = signal<WhoamiCharacter[]>([]);
   protected readonly players = signal<SetupPlayer[]>([]);
   protected readonly nameDraft = signal('');
   protected readonly phase = signal<Phase>('setup');
-  protected readonly characters = signal<Record<string, string>>({});
+  protected readonly characters = signal<Record<string, WhoamiCharacter>>({});
   protected readonly memorizeIndex = signal(0);
   protected readonly holding = signal(false);
   protected readonly showHowTo = signal(false);
+  protected readonly cancelConfirm = signal<CancelConfirm>('idle');
 
   protected readonly canStart = computed(
     () => this.loadState() === 'ready' && this.players().length >= 2,
@@ -60,11 +75,22 @@ export class WhoAmI {
     if (!viewer) return null;
     const others = list
       .filter((p) => p.id !== viewer.id)
-      .map((p) => ({
-        name: p.name,
-        character: this.characters()[p.id] ?? '·',
-      }));
+      .map((p) => {
+        const ch = this.characters()[p.id];
+        return {
+          name: p.name,
+          character: ch?.name ?? '·',
+          wiki: ch?.wiki,
+        };
+      });
     return { viewer: viewer.name, others };
+  });
+
+  protected readonly portraitSize = computed<PortraitSize>(() => {
+    const n = this.currentMemorize()?.others.length ?? 1;
+    if (n <= 1) return 'lg';
+    if (n <= 4) return 'md';
+    return 'sm';
   });
 
   constructor() {
@@ -72,7 +98,7 @@ export class WhoAmI {
       const locale = this.i18n.locale();
       this.loadState.set('loading');
       const sub = this.http
-        .get<{ name: string }[]>(FILES[locale])
+        .get<WhoamiCharacter[]>(FILES[locale])
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (data) => {
@@ -98,9 +124,9 @@ export class WhoAmI {
   protected start(): void {
     if (!this.canStart()) return;
     const bank = [...this.bank()].sort(() => Math.random() - 0.5);
-    const chars: Record<string, string> = {};
+    const chars: Record<string, WhoamiCharacter> = {};
     this.players().forEach((p, i) => {
-      chars[p.id] = bank[i % bank.length]!.name;
+      chars[p.id] = bank[i % bank.length]!;
     });
     this.characters.set(chars);
     this.memorizeIndex.set(0);
@@ -133,8 +159,27 @@ export class WhoAmI {
     this.showHowTo.set(false);
   }
 
+  protected beginCancel(): void {
+    this.cancelConfirm.set('one');
+  }
+
+  protected confirmCancelStep(): void {
+    if (this.cancelConfirm() === 'one') {
+      this.cancelConfirm.set('two');
+      return;
+    }
+    if (this.cancelConfirm() === 'two') {
+      this.backSetup();
+    }
+  }
+
+  protected dismissCancel(): void {
+    this.cancelConfirm.set('idle');
+  }
+
   protected backSetup(): void {
     this.phase.set('setup');
     this.holding.set(false);
+    this.cancelConfirm.set('idle');
   }
 }

@@ -1,11 +1,13 @@
 import { Injectable, signal } from '@angular/core';
 import { io, Socket } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
+import { getDeviceId } from './device-id';
 import type { GameId, ImpostorSetup, PublicRoomState } from './room.types';
 
 @Injectable({ providedIn: 'root' })
 export class RoomService {
   private socket: Socket | null = null;
+  private roomCode: string | null = null;
 
   readonly state = signal<PublicRoomState | null>(null);
   readonly connecting = signal(false);
@@ -28,7 +30,6 @@ export class RoomService {
       }
 
       const socket = io(environment.apiUrl, {
-        // Polling first: websocket-only often fails behind proxies / cold starts.
         transports: ['polling', 'websocket'],
         autoConnect: true,
         reconnection: true,
@@ -64,7 +65,6 @@ export class RoomService {
       };
 
       const onConnect = () => finishOk();
-      // Do not reject on the first connect_error — Socket.IO retries / upgrades.
       const onTransientError = () => {
         this.waking.set(true);
       };
@@ -77,10 +77,19 @@ export class RoomService {
       socket.on('connect_error', onTransientError);
       socket.on('room:state', (state: PublicRoomState) => {
         this.state.set(state);
+        this.roomCode = state.code;
         this.error.set(null);
       });
       socket.on('room:error', (payload: { message?: string }) => {
         this.error.set(payload?.message ?? 'Error');
+      });
+      socket.io.on('reconnect', () => {
+        const code = this.roomCode;
+        if (code) {
+          void this.join(code).catch(() => {
+            /* error signal set by join */
+          });
+        }
       });
 
       void fetch(`${environment.apiUrl}/api/health`).catch(() => {
@@ -93,6 +102,7 @@ export class RoomService {
     this.socket?.removeAllListeners();
     this.socket?.disconnect();
     this.socket = null;
+    this.roomCode = null;
     this.state.set(null);
   }
 
@@ -116,12 +126,13 @@ export class RoomService {
     await this.connect();
     const res = await this.emit<{ ok: boolean; state?: PublicRoomState; error?: string }>(
       'room:create',
-      { game },
+      { game, deviceId: getDeviceId() },
     );
     if (!res.ok || !res.state) {
       throw new Error(res.error ?? 'Create failed');
     }
     this.state.set(res.state);
+    this.roomCode = res.state.code;
     return res.state;
   }
 
@@ -129,12 +140,13 @@ export class RoomService {
     await this.connect();
     const res = await this.emit<{ ok: boolean; state?: PublicRoomState; error?: string }>(
       'room:join',
-      { code },
+      { code, deviceId: getDeviceId() },
     );
     if (!res.ok || !res.state) {
       throw new Error(res.error ?? 'Join failed');
     }
     this.state.set(res.state);
+    this.roomCode = res.state.code;
     return res.state;
   }
 

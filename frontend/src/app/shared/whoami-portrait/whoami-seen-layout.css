@@ -1,0 +1,109 @@
+.whoami__seen {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-wrap: wrap;
+  align-content: center;
+  justify-content: center;
+  align-items: flex-start;
+  gap: 0.65rem 0.85rem;
+  box-sizing: border-box;
+}
+
+.whoami__seen-item {
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.2rem;
+  min-width: 0;
+  box-sizing: border-box;
+}
+
+.whoami__seen-player {
+  width: 100%;
+  font: 700 var(--text-sm) / 1.15 var(--font-outlier);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--color-muted);
+  text-align: center;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 1: one big centered tile */
+.whoami__seen[data-count='1'] .whoami__seen-item {
+  flex: 0 0 auto;
+  width: min(100%, 12rem);
+}
+
+/* 2: left + right */
+.whoami__seen[data-count='2'] {
+  gap: 0.75rem 1.25rem;
+}
+.whoami__seen[data-count='2'] .whoami__seen-item {
+  flex: 0 0 calc(50% - 0.65rem);
+  max-width: 9rem;
+}
+
+/* 3: two on top, one centered below */
+.whoami__seen[data-count='3'] {
+  gap: 0.55rem 0.9rem;
+}
+.whoami__seen[data-count='3'] .whoami__seen-item {
+  flex: 0 0 calc(50% - 0.45rem);
+  max-width: 8.25rem;
+}
+
+/* 4: 2×2 */
+.whoami__seen[data-count='4'] {
+  gap: 0.5rem 0.75rem;
+}
+.whoami__seen[data-count='4'] .whoami__seen-item {
+  flex: 0 0 calc(50% - 0.4rem);
+  max-width: 7.5rem;
+}
+
+/* 5–6: rows of three (5 → 3+2 centered) */
+.whoami__seen[data-count='5'],
+.whoami__seen[data-count='6'] {
+  gap: 0.4rem 0.55rem;
+}
+.whoami__seen[data-count='5'] .whoami__seen-item,
+.whoami__seen[data-count='6'] .whoami__seen-item {
+  flex: 0 0 calc(33.333% - 0.4rem);
+  max-width: 6.5rem;
+}
+
+/* 7–12: tighter rows of three */
+.whoami__seen[data-count='7'],
+.whoami__seen[data-count='8'],
+.whoami__seen[data-count='9'],
+.whoami__seen[data-count='10'],
+.whoami__seen[data-count='11'],
+.whoami__seen[data-count='12'] {
+  gap: 0.3rem 0.4rem;
+}
+.whoami__seen[data-count='7'] .whoami__seen-item,
+.whoami__seen[data-count='8'] .whoami__seen-item,
+.whoami__seen[data-count='9'] .whoami__seen-item,
+.whoami__seen[data-count='10'] .whoami__seen-item,
+.whoami__seen[data-count='11'] .whoami__seen-item,
+.whoami__seen[data-count='12'] .whoami__seen-item {
+  flex: 0 0 calc(33.333% - 0.3rem);
+  max-width: 5.5rem;
+}
+
+.whoami__seen[data-count='5'] .whoami__seen-player,
+.whoami__seen[data-count='6'] .whoami__seen-player,
+.whoami__seen[data-count='7'] .whoami__seen-player,
+.whoami__seen[data-count='8'] .whoami__seen-player,
+.whoami__seen[data-count='9'] .whoami__seen-player,
+.whoami__seen[data-count='10'] .whoami__seen-player,
+.whoami__seen[data-count='11'] .whoami__seen-player,
+.whoami__seen[data-count='12'] .whoami__seen-player {
+  font-size: 0.68rem;
+}

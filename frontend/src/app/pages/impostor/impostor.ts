@@ -15,6 +15,8 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { RouterLink } from '@angular/router';
 import { I18nService, Locale } from '../../core/i18n/i18n';
+import { GameAtmosphere } from '../../shared/game-atmosphere/game-atmosphere';
+import { GAME_ATMOSPHERE } from '../../shared/game-atmosphere/game-atmosphere.model';
 import { SiteMenu } from '../../shared/site-menu/site-menu';
 import {
   DealtPlayer,
@@ -48,10 +50,15 @@ const WORD_FILES: Record<Locale, string> = {
 };
 
 @Component({
-  imports: [RouterLink, SiteMenu],
+  imports: [RouterLink, SiteMenu, GameAtmosphere],
   selector: 'app-impostor',
   styleUrl: './impostor.css',
   templateUrl: './impostor.html',
+  host: {
+    '[style.--atmosphere-paper]': 'atm.paper',
+    '[style.--atmosphere-ink]': 'atm.ink',
+    '[style.background]': 'atm.paper',
+  },
 })
 export class Impostor {
   private readonly http = inject(HttpClient);
@@ -60,6 +67,7 @@ export class Impostor {
   private readonly injector = inject(Injector);
   private readonly namesList = viewChild<ElementRef<HTMLElement>>('namesList');
 
+  protected readonly atm = GAME_ATMOSPHERE.impostor;
   protected readonly t = this.i18n.t;
   protected readonly nameMax = PLAYER_NAME_MAX;
 

@@ -1,0 +1,8 @@
+<figure class="portrait">
+  @if (src() && !failed()) {
+    <img class="portrait__img" [src]="src()" [alt]="name()" loading="lazy" decoding="async" />
+  } @else {
+    <div class="portrait__fallback" aria-hidden="true">{{ name().slice(0, 1) }}</div>
+  }
+  <figcaption class="portrait__caption">{{ name() }}</figcaption>
+</figure>

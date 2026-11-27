@@ -29,7 +29,7 @@ export interface PublicRoomState {
   code: string;
   game: GameId;
   phase: RoomPhase;
-  hostSocketId: string;
+  hostDeviceId: string;
   seats: Seat[];
   claims: Record<string, string[]>;
   connectedCount: number;
@@ -53,6 +53,6 @@ export interface PublicRoomState {
   whoami?: {
     phase: 'memorize' | 'play';
     memorizeIndex: number;
-    visibleCharacters?: Record<string, string>;
+    visibleCharacters?: Record<string, { name: string; wiki?: string }>;
   };
 }

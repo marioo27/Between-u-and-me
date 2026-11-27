@@ -21,7 +21,7 @@ npm test       # Vitest unit tests
 
 ## Notes
 
-- Games: `/` home catalog, `/nhie` Never Have I Ever, `/impostor` The Impostor.
+- Games: `/` home catalog, `/nhie` Never Have I Ever, `/impostor` Impostor, `/whoami` Who Am I.
 - Language + help live in the header **settings menu** (`shared/site-menu`).
 - Prompt / word banks in `public/data/` (`yo-nunca.json`, `nhie.json`, `impostor-es.json`, `impostor-en.json`).
 - SPA redirects for Netlify: `public/_redirects`.

@@ -1,4 +1,5 @@
 <main class="whoami">
+  <app-game-atmosphere preset="whoami" />
   <header class="whoami__bar">
     <div class="container whoami__bar-inner">
       <a class="whoami__back" routerLink="/">{{ t().whoamiBack }}</a>
@@ -8,6 +9,12 @@
   </header>
 
   <section class="container whoami__panel">
+    @if (phase() !== 'setup') {
+      <button type="button" class="whoami__end" (click)="beginCancel()">
+        {{ t().whoamiCancel }}
+      </button>
+    }
+
     @if (loadState() === 'loading') {
       <p role="status">{{ t().impostorLoading }}</p>
     }
@@ -58,7 +65,6 @@
     @if (phase() === 'memorize' && currentMemorize(); as mem) {
       <p class="whoami__hint">{{ t().impostorPassTo }}</p>
       <p class="display whoami__big">{{ mem.viewer }}</p>
-      <p class="whoami__hint">{{ t().whoamiHold }}</p>
       <button
         type="button"
         class="flip-card"
@@ -68,13 +74,20 @@
         (pointerleave)="holdEnd()"
         (pointercancel)="holdEnd()"
       >
-        <span class="flip-card__face flip-card__face--back">{{ mem.viewer }}</span>
+        <span class="flip-card__face flip-card__face--back">
+          <span class="flip-card__name">{{ mem.viewer }}</span>
+          <span class="flip-card__hold">{{ t().whoamiHold }}</span>
+        </span>
         <span class="flip-card__face flip-card__face--front">
-          <ul class="whoami__seen">
+          <ul class="whoami__seen" [attr.data-count]="mem.others.length">
             @for (o of mem.others; track o.name) {
-              <li>
-                <span>{{ o.name }}</span>
-                <strong>{{ o.character }}</strong>
+              <li class="whoami__seen-item">
+                <span class="whoami__seen-player">{{ o.name }}</span>
+                <app-whoami-portrait
+                  [name]="o.character"
+                  [wiki]="o.wiki"
+                  [size]="portraitSize()"
+                />
               </li>
             }
           </ul>
@@ -98,6 +111,23 @@
         <button type="button" class="die" (click)="closeHowTo()">OK</button>
       </div>
       <button type="button" class="modal__backdrop" [attr.aria-label]="t().menuClose" (click)="closeHowTo()"></button>
+    </div>
+  }
+
+  @if (cancelConfirm() !== 'idle') {
+    <div class="modal" role="dialog" [attr.aria-label]="t().whoamiCancel">
+      <div class="modal__card">
+        <h2 class="display">
+          {{ cancelConfirm() === 'one' ? t().whoamiCancelConfirm1 : t().whoamiCancelConfirm2 }}
+        </h2>
+        <div class="modal__actions">
+          <button type="button" class="die" (click)="dismissCancel()">{{ t().whoamiCancelNo }}</button>
+          <button type="button" class="modal__danger" (click)="confirmCancelStep()">
+            {{ t().whoamiCancelYes }}
+          </button>
+        </div>
+      </div>
+      <button type="button" class="modal__backdrop" [attr.aria-label]="t().menuClose" (click)="dismissCancel()"></button>
     </div>
   }
 </main>

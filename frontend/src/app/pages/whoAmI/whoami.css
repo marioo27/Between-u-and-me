@@ -1,13 +1,25 @@
 :host {
   display: block;
   min-height: 100dvh;
-  background: var(--color-paper);
+  background: var(--atmosphere-paper, var(--color-paper));
   color: var(--color-ink);
+  transition: background-color 0.45s var(--ease-out);
+}
+
+.whoami {
+  position: relative;
+  background: transparent;
+}
+
+.whoami > :not(.atmosphere) {
+  position: relative;
+  z-index: 1;
 }
 
 .whoami__bar {
   height: 3.5rem;
   border-bottom: var(--rule-bar) solid var(--color-ink);
+  background: transparent;
 }
 
 .whoami__bar-inner {
@@ -35,6 +47,17 @@
   padding-block: var(--space-xl);
   display: grid;
   gap: var(--space-md);
+}
+
+.whoami__end {
+  justify-self: start;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-decoration: underline;
+  cursor: pointer;
 }
 
 .whoami__tools {
@@ -73,8 +96,7 @@
   font: 600 var(--text-md) / 1.2 var(--font-body);
 }
 
-.whoami__list,
-.whoami__seen {
+.whoami__list {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -120,8 +142,8 @@
 
 .flip-card {
   position: relative;
-  width: min(100%, 26rem);
-  height: 16rem;
+  width: min(100%, 34rem);
+  height: min(68dvh, 32rem);
   margin: 0 auto;
   border: 9px solid var(--color-ink);
   background: color-mix(in oklab, var(--color-paper) 85%, white);
@@ -137,19 +159,37 @@
   inset: 0;
   display: grid;
   place-content: center;
-  padding: var(--space-md);
+  place-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  overflow: hidden;
   backface-visibility: hidden;
   transition: transform 0.35s var(--ease-out);
 }
 
+.flip-card__face--front .whoami__seen {
+  max-height: 100%;
+}
+
 .flip-card__face--back {
   transform: rotateY(0);
-  font: 700 1.5rem / 1.2 var(--font-outlier);
+}
+
+.flip-card__name {
+  font: 700 clamp(1.5rem, 5vw, 2rem) / 1.15 var(--font-outlier);
+  text-align: center;
+}
+
+.flip-card__hold {
+  color: var(--color-muted);
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .flip-card__face--front {
   transform: rotateY(180deg);
-  overflow: auto;
+  align-content: center;
 }
 
 .flip-card--open .flip-card__face--back {
@@ -158,13 +198,6 @@
 
 .flip-card--open .flip-card__face--front {
   transform: rotateY(0);
-}
-
-.whoami__seen li {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-sm);
-  font: 600 var(--text-sm) / 1.3 var(--font-body);
 }
 
 .modal {
@@ -197,4 +230,23 @@
 .modal__body {
   white-space: pre-wrap;
   font: 500 var(--text-sm) / 1.45 var(--font-body);
+}
+
+.modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.modal__danger {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
 }

@@ -2,12 +2,14 @@ import cors from 'cors';
 import express from 'express';
 import { createServer } from 'node:http';
 import { Server } from 'socket.io';
+import { normalizeDeviceId } from './device.js';
 import {
   addSeat,
   claimSeats,
   createRoom,
   gameAction,
   getRoom,
+  isHostSocket,
   joinRoom,
   leaveSocket,
   publicState,
@@ -50,40 +52,52 @@ function emitRoom(code: string): void {
   }
 }
 
-io.on('connection', (socket) => {
-  socket.on('room:create', (payload: { game?: GameId }, ack?: (r: unknown) => void) => {
-    try {
-      const game = payload?.game;
-      if (game !== 'nhie' && game !== 'impostor' && game !== 'whoami') {
-        throw new Error('Invalid game');
-      }
-      const room = createRoom(game, socket.id);
-      void socket.join(room.code);
-      const state = publicState(room, socket.id);
-      ack?.({ ok: true, state });
-      socket.emit('room:state', state);
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error';
-      ack?.({ ok: false, error: message });
-      socket.emit('room:error', { message });
-    }
-  });
+function requireDevice(payload: { deviceId?: string } | undefined): string {
+  return normalizeDeviceId(payload?.deviceId);
+}
 
-  socket.on('room:join', (payload: { code?: string }, ack?: (r: unknown) => void) => {
-    try {
-      const code = String(payload?.code ?? '')
-        .trim()
-        .toUpperCase();
-      const room = joinRoom(code, socket.id);
-      void socket.join(room.code);
-      emitRoom(room.code);
-      ack?.({ ok: true, state: publicState(room, socket.id) });
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Error';
-      ack?.({ ok: false, error: message });
-      socket.emit('room:error', { message });
-    }
-  });
+io.on('connection', (socket) => {
+  socket.on(
+    'room:create',
+    (payload: { game?: GameId; deviceId?: string }, ack?: (r: unknown) => void) => {
+      try {
+        const game = payload?.game;
+        if (game !== 'nhie' && game !== 'impostor' && game !== 'whoami') {
+          throw new Error('Invalid game');
+        }
+        const deviceId = requireDevice(payload);
+        const room = createRoom(game, socket.id, deviceId);
+        void socket.join(room.code);
+        const state = publicState(room, socket.id);
+        ack?.({ ok: true, state });
+        socket.emit('room:state', state);
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Error';
+        ack?.({ ok: false, error: message });
+        socket.emit('room:error', { message });
+      }
+    },
+  );
+
+  socket.on(
+    'room:join',
+    (payload: { code?: string; deviceId?: string }, ack?: (r: unknown) => void) => {
+      try {
+        const code = String(payload?.code ?? '')
+          .trim()
+          .toUpperCase();
+        const deviceId = requireDevice(payload);
+        const room = joinRoom(code, socket.id, deviceId);
+        void socket.join(room.code);
+        emitRoom(room.code);
+        ack?.({ ok: true, state: publicState(room, socket.id) });
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Error';
+        ack?.({ ok: false, error: message });
+        socket.emit('room:error', { message });
+      }
+    },
+  );
 
   socket.on(
     'room:setSeats',
@@ -91,7 +105,7 @@ io.on('connection', (socket) => {
       try {
         const room = getRoom(String(payload?.code ?? ''));
         if (!room) throw new Error('Room not found');
-        if (room.hostSocketId !== socket.id) throw new Error('Only host');
+        if (!isHostSocket(room, socket.id)) throw new Error('Only host');
         setSeats(room, payload?.names ?? []);
         emitRoom(room.code);
         ack?.({ ok: true });
@@ -108,7 +122,7 @@ io.on('connection', (socket) => {
       try {
         const room = getRoom(String(payload?.code ?? ''));
         if (!room) throw new Error('Room not found');
-        if (room.hostSocketId !== socket.id) throw new Error('Only host');
+        if (!isHostSocket(room, socket.id)) throw new Error('Only host');
         addSeat(room, String(payload?.name ?? ''));
         emitRoom(room.code);
         ack?.({ ok: true });
@@ -125,7 +139,7 @@ io.on('connection', (socket) => {
       try {
         const room = getRoom(String(payload?.code ?? ''));
         if (!room) throw new Error('Room not found');
-        if (room.hostSocketId !== socket.id) throw new Error('Only host');
+        if (!isHostSocket(room, socket.id)) throw new Error('Only host');
         removeSeat(room, String(payload?.seatId ?? ''));
         emitRoom(room.code);
         ack?.({ ok: true });

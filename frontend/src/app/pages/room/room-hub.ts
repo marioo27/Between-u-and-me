@@ -5,6 +5,11 @@ import { map } from 'rxjs';
 import { I18nService } from '../../core/i18n/i18n';
 import { RoomService } from '../../core/room/room.service';
 import type { GameId } from '../../core/room/room.types';
+import { GameAtmosphere } from '../../shared/game-atmosphere/game-atmosphere';
+import {
+  GAME_ATMOSPHERE,
+  type GameAtmospherePreset,
+} from '../../shared/game-atmosphere/game-atmosphere.model';
 import { SiteMenu } from '../../shared/site-menu/site-menu';
 
 function parseGame(raw: string | null | undefined): GameId | null {
@@ -13,10 +18,14 @@ function parseGame(raw: string | null | undefined): GameId | null {
 }
 
 @Component({
-  imports: [RouterLink, SiteMenu],
+  imports: [RouterLink, SiteMenu, GameAtmosphere],
   selector: 'app-room-hub',
   styleUrl: './room.css',
   templateUrl: './room-hub.html',
+  host: {
+    '[style.--atmosphere-paper]': 'atmPaper()',
+    '[style.background]': 'atmPaper()',
+  },
 })
 export class RoomHub {
   private readonly rooms = inject(RoomService);
@@ -52,6 +61,14 @@ export class RoomHub {
   protected readonly busy = signal(false);
   protected readonly error = this.rooms.error;
   protected readonly waking = this.rooms.waking;
+
+  protected readonly atmPreset = computed<GameAtmospherePreset>(() => {
+    const g = this.game();
+    if (g === 'impostor') return 'impostor';
+    if (g === 'whoami') return 'whoami';
+    return 'home';
+  });
+  protected readonly atmPaper = computed(() => GAME_ATMOSPHERE[this.atmPreset()].paper);
 
   constructor() {
     const fromQuery = this.route.snapshot.queryParamMap.get('error');

@@ -1,0 +1,40 @@
+---
+description: Between U & Me — stack, i18n dual, docs confirmation before README edits
+alwaysApply: true
+---
+
+# Between U & Me
+
+## Stack
+
+- Front: Angular in `frontend/` (Netlify SPA).
+- API / rooms: Express + Socket.IO in `backend/` (Render Docker).
+- Health: `/api/health`. Env: `CORS_ORIGIN` (Netlify origin). `PORT` set by Render.
+- Prod UI `apiUrl`: `frontend/src/environments/environment.prod.ts` → `https://between-u-and-me.onrender.com`.
+
+## i18n
+
+- Product source language: **Spanish (`es`)**.
+- Any new/changed/removed UI string in `frontend/src/app/core/i18n/i18n.ts` must update **`es` and `en` in the same change**. Never leave EN for later.
+- Content banks `*-es.json` / `*-en.json`: same rule when editing a pair.
+
+## Documentation confirmation
+
+When code changes **contradict** `README.md` / repo docs, or add a **relevant feature not documented** there:
+
+1. Stop and briefly state the gap (doc says X; code does Y).
+2. Ask for **explicit confirmation** before editing README/docs.
+3. Do **not** update docs on your own unless the user confirms or asks for the doc update in the same message.
+
+Example: do not change live API hostname in docs/env without explicit OK.
+
+## How to talk to Mario
+
+- After finishing work, explain **what changed and why** in plain language (a short overview).
+- Do **not** answer with only “Hecho” / a bare checklist of files touched.
+- Keep it readable; go deep only if he asks for more detail.
+- Spanish is fine when he writes in Spanish.
+
+## Safety
+
+- No secrets in files/commits. No git config / push unless the user asks.

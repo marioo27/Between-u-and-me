@@ -1,0 +1,77 @@
+:host {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+:host(.portrait-host--lg) {
+  max-width: 11.5rem;
+}
+
+:host(.portrait-host--md) {
+  max-width: 8.25rem;
+}
+
+:host(.portrait-host--sm) {
+  max-width: 5.75rem;
+}
+
+.portrait {
+  margin: 0;
+  width: 100%;
+  display: grid;
+  gap: 0.3rem;
+  justify-items: stretch;
+  text-align: center;
+}
+
+.portrait__img,
+.portrait__fallback {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  height: auto;
+  object-fit: cover;
+  object-position: center 20%;
+  border: 3px solid var(--color-ink);
+  border-radius: 12px;
+  box-shadow: 3px 3px 0 var(--color-ink);
+  background: color-mix(in oklab, var(--color-paper) 70%, white);
+  box-sizing: border-box;
+}
+
+:host(.portrait-host--sm) .portrait__img,
+:host(.portrait-host--sm) .portrait__fallback {
+  border-width: 2px;
+  box-shadow: 2px 2px 0 var(--color-ink);
+  border-radius: 10px;
+}
+
+.portrait__fallback {
+  display: grid;
+  place-items: center;
+  font: 900 clamp(1.4rem, 6vw, 2.4rem) / 1 var(--font-display);
+  text-transform: uppercase;
+  background: var(--color-accent);
+}
+
+:host(.portrait-host--sm) .portrait__fallback {
+  font-size: clamp(1.1rem, 4.5vw, 1.5rem);
+}
+
+.portrait__caption {
+  margin: 0;
+  width: 100%;
+  max-width: 100%;
+  padding-inline: 0.15rem;
+  font: 800 clamp(0.78rem, 2.6vw, 1rem) / 1.2 var(--font-display);
+  letter-spacing: var(--tracking-display);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+:host(.portrait-host--sm) .portrait__caption {
+  font-size: clamp(0.68rem, 2.2vw, 0.82rem);
+}

@@ -1,13 +1,24 @@
 :host {
   display: block;
   min-height: 100dvh;
-  background: var(--color-paper);
+  background: var(--atmosphere-paper, var(--color-paper));
   color: var(--color-ink);
+}
+
+.room {
+  position: relative;
+  background: transparent;
+}
+
+.room > :not(.atmosphere) {
+  position: relative;
+  z-index: 1;
 }
 
 .room__bar {
   height: 3.5rem;
   border-bottom: var(--rule-bar) solid var(--color-ink);
+  background: transparent;
 }
 
 .room__bar-inner {
@@ -264,8 +275,7 @@
   text-align: center;
 }
 
-.room__seats,
-.room__whoami {
+.room__seats {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -273,8 +283,7 @@
   gap: var(--space-sm);
 }
 
-.room__seats li,
-.room__whoami li {
+.room__seats li {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -284,7 +293,15 @@
 }
 
 .room__whoami {
-  gap: var(--space-md);
+  margin-block: var(--space-md);
+  min-height: 12rem;
+}
+
+.room__whoami-item {
+  display: grid;
+  justify-items: center;
+  gap: var(--space-xs);
+  padding: var(--space-sm) 0;
 }
 
 .room__whoami-name {
@@ -315,6 +332,35 @@
 .chip:disabled {
   opacity: 0.4;
   cursor: not-allowed;
+}
+
+.room__setup {
+  display: grid;
+  gap: var(--space-sm);
+  margin-top: var(--space-md);
+}
+
+.room__dropdown-toggle {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.65rem 0.9rem;
+  border: 2px solid var(--color-ink);
+  background: color-mix(in oklab, var(--color-paper) 80%, white);
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-align: left;
+  cursor: pointer;
+}
+
+.room__range {
+  width: min(100%, 18rem);
+  accent-color: var(--color-ink);
+}
+
+.room__check {
+  display: flex;
+  gap: var(--space-sm);
+  align-items: flex-start;
+  font: 600 var(--text-sm) / 1.35 var(--font-body);
 }
 
 .linkish {
@@ -354,7 +400,18 @@
 
 .flip-card__face--back {
   transform: rotateY(0deg);
+}
+
+.flip-card__name {
   font: 700 clamp(1.35rem, 4.5vw, 1.85rem) / 1.2 var(--font-outlier);
+  text-align: center;
+}
+
+.flip-card__hold {
+  color: var(--color-muted);
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 
 .flip-card__face--front {
@@ -412,4 +469,50 @@
   list-style: none;
   display: grid;
   gap: var(--space-sm);
+}
+
+.modal {
+  position: fixed;
+  inset: 0;
+  z-index: 500;
+  display: grid;
+  place-items: center;
+  padding: var(--space-md);
+}
+
+.modal__backdrop {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: color-mix(in oklab, #111 35%, transparent);
+  cursor: pointer;
+}
+
+.modal__card {
+  position: relative;
+  z-index: 1;
+  width: min(100%, 24rem);
+  padding: var(--space-lg);
+  border: 2px solid var(--color-ink);
+  background: var(--color-paper);
+  box-shadow: 5px 5px 0 var(--color-ink);
+}
+
+.modal__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-md);
+  margin-top: var(--space-md);
+}
+
+.modal__danger {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--color-muted);
+  font: 600 var(--text-sm) / 1.2 var(--font-outlier);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+  cursor: pointer;
 }

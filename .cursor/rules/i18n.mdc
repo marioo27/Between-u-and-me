@@ -1,0 +1,12 @@
+---
+description: Keep ES and EN message keys in sync in the same edit
+globs: frontend/src/app/core/i18n/**
+alwaysApply: false
+---
+
+# i18n edits
+
+- Source copy: Spanish (`es`).
+- Every key add/change/delete in `i18n.ts` → update **`es` and `en` together**.
+- Prefer translating in the same PR/edit; do not merge ES-only UI strings.
+- `MessageKey` is derived from `es`; missing `en` keys fail at runtime when locale is EN.

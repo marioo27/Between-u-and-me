@@ -1,4 +1,5 @@
 <main class="game">
+  <app-game-atmosphere preset="impostor" />
   <header class="game__bar">
     <div class="container game__bar-inner">
       <a class="game__back" routerLink="/">{{ t().impostorBack }}</a>
@@ -194,7 +195,6 @@
       <div class="reveal">
         <p class="reveal__pass">{{ t().impostorPassTo }}</p>
         <p class="display reveal__name">{{ player.name.length ? player.name : '·' }}</p>
-        <p class="reveal__hint">{{ t().impostorHold }}</p>
 
         <button
           type="button"
@@ -209,7 +209,8 @@
           (pointercancel)="holdEnd()"
         >
           <span class="flip-card__face flip-card__face--back">
-            {{ player.name.length ? player.name : '·' }}
+            <span class="flip-card__name">{{ player.name.length ? player.name : '·' }}</span>
+            <span class="flip-card__hold">{{ t().impostorHold }}</span>
           </span>
           <span class="flip-card__face flip-card__face--front">
             @if (player.isImpostor) {

@@ -1,0 +1,66 @@
+<div
+  class="atmosphere"
+  aria-hidden="true"
+  [style.--atmosphere-paper]="theme().paper"
+  [style.--atmosphere-ink]="theme().ink"
+>
+  @for (motif of motifs(); track motif.id) {
+    <span
+      class="atmosphere__motif"
+      [style.--x]="motif.x + '%'"
+      [style.--y]="motif.y + '%'"
+      [style.--size]="motif.size + 'rem'"
+      [style.--duration]="motif.duration + 's'"
+      [style.--delay]="motif.delay + 's'"
+      [style.--drift]="motif.drift + 'deg'"
+      [style.--tx]="motif.travelX + 'rem'"
+      [style.--ty]="motif.travelY + 'rem'"
+    >
+      <svg class="atmosphere__icon" viewBox="0 0 64 64" focusable="false">
+        @switch (motif.icon) {
+          @case ('mask') {
+            <path d="M8 28c0-12 12-18 24-18s24 6 24 18c0 14-12 22-24 22S8 42 8 28Z" />
+            <path d="M20 30h8M36 30h8M24 42c4 4 12 4 16 0" />
+          }
+          @case ('eye') {
+            <path d="M6 32c8-14 20-20 26-20s18 6 26 20c-8 14-20 20-26 20S14 46 6 32Z" />
+            <circle cx="32" cy="32" r="8" />
+            <circle cx="32" cy="32" r="3" />
+          }
+          @case ('dice') {
+            <path d="M12 18h40v40H12Z" />
+            <circle cx="24" cy="30" r="3" />
+            <circle cx="40" cy="30" r="3" />
+            <circle cx="32" cy="38" r="3" />
+            <circle cx="24" cy="46" r="3" />
+            <circle cx="40" cy="46" r="3" />
+          }
+          @case ('secret') {
+            <circle cx="32" cy="28" r="14" />
+            <path d="M18 42 32 56l14-14" />
+            <path d="M26 28h4M34 28h4M28 34c2 3 6 3 8 0" />
+          }
+          @case ('question') {
+            <circle cx="32" cy="32" r="24" />
+            <path d="M24 24c0-8 16-8 16 2 0 6-8 8-8 14" />
+            <path d="M32 48v4" />
+          }
+          @case ('face') {
+            <circle cx="32" cy="32" r="22" />
+            <circle cx="24" cy="28" r="3" />
+            <circle cx="40" cy="28" r="3" />
+            <path d="M24 40c4 6 12 6 16 0" />
+          }
+          @case ('search') {
+            <circle cx="28" cy="28" r="16" />
+            <path d="M40 40 54 54" />
+          }
+          @case ('tag') {
+            <path d="M8 28 28 8h20v20L28 48Z" />
+            <circle cx="40" cy="20" r="4" />
+          }
+        }
+      </svg>
+    </span>
+  }
+</div>
